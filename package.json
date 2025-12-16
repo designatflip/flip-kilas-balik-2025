@@ -1,0 +1,21 @@
+{
+  "name": "flip-kilas-balik-2025",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.87.3"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
