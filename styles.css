@@ -140,10 +140,11 @@ body {
 
 .nav-buttons {
   position: absolute;
-  top: 100px;
+  /* top: 100px; */
   left: 0;
   right: 0;
   display: flex;
+  bottom: 0;
   justify-content: space-between;
   padding: 20px 30px;
   pointer-events: auto;
@@ -173,7 +174,7 @@ html {
 /* Back button */
 .back-button {
   position: fixed;
-  top: 20px;
+  top: 60px;
   left: 20px;
   width: 50px;
   height: 50px;
@@ -201,7 +202,7 @@ html {
 }
 
 /* Mobile optimization */
-@media (max-width: 480px) {
+@media (max-width: 375px) {
   .app-container {
     max-width: 100vw;
   }
