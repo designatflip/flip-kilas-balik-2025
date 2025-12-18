@@ -171,11 +171,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     imageContainer.appendChild(img);
 
-    // Add amount saved overlay on asset 14 (index 13)
-    if (index === 13) {
+    // Add amount saved overlay on asset 14 (index 12)
+    if (index === 12) {
       const amountOverlay = document.createElement("div");
       amountOverlay.className = "amount-overlay";
-      amountOverlay.innerHTML = `<div style="font-size: 20px; margin-bottom: 10px;">amount_saved</div><strong>${amountSaved}</strong>`;
+      amountOverlay.innerHTML = `<strong style="margin-bottom: -40px; display: block;">${amountSaved}</strong>`;
       imageContainer.appendChild(amountOverlay);
     }
 
@@ -184,10 +184,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
       dataOverlay.innerHTML = `
-        <div style="font-size: 20px; margin-bottom: 10px;">flip_deals_purchase_trx</div>
-        <strong style="margin-bottom: 20px; display: block;">${flipDealsPurchase}</strong>
-        <div style="font-size: 20px; margin-bottom: 10px;">cashback_received_amount</div>
-        <strong>${cashbackReceived}</strong>
+        <strong style="margin-bottom: 36px; display: block;">${flipDealsPurchase}</strong>
+        <strong style="margin-bottom: 80px; display: block;">${cashbackReceived}</strong>
       `;
       imageContainer.appendChild(dataOverlay);
     }
@@ -196,7 +194,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 17) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
-      dataOverlay.innerHTML = `<div style="font-size: 20px; margin-bottom: 10px;">ewallet_topup_count</div><strong>${ewalletTopupCount}</strong>`;
+      dataOverlay.innerHTML = `<strong style="margin-bottom: 110px; display: block;">${ewalletTopupCount}</strong>`;
       imageContainer.appendChild(dataOverlay);
     }
 
@@ -204,7 +202,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 18) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
-      dataOverlay.innerHTML = `<div style="font-size: 20px; margin-bottom: 10px;">qris_transaction_count</div><strong>${qrisTransactionCount}</strong>`;
+      dataOverlay.innerHTML = `<strong style="margin-bottom: 110px; display: block;">${qrisTransactionCount}</strong>`;
       imageContainer.appendChild(dataOverlay);
     }
 
@@ -212,7 +210,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 19) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
-      dataOverlay.innerHTML = `<div style="font-size: 20px; margin-bottom: 10px;">unit_owned</div><strong>${unitOwned}</strong>`;
+      dataOverlay.innerHTML = `<strong style="margin-bottom: 110px; display: block;">${unitOwned}</strong>`;
       imageContainer.appendChild(dataOverlay);
     }
 
@@ -220,7 +218,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 20) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
-      dataOverlay.innerHTML = `<div style="font-size: 20px; margin-bottom: 10px;">profit_share_receiver</div><strong>${profitShareReceiver}</strong>`;
+      dataOverlay.innerHTML = `<strong style="margin-bottom: 110px; display: block;">${profitShareReceiver}</strong>`;
       imageContainer.appendChild(dataOverlay);
     }
 
@@ -228,7 +226,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 22) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
-      dataOverlay.innerHTML = `<div style="font-size: 20px; margin-bottom: 10px;">unique_code_donation_amount</div><strong>${uniqueCodeDonation}</strong>`;
+      dataOverlay.innerHTML = `<strong style="margin-bottom: 110px; display: block;">${uniqueCodeDonation}</strong>`;
       imageContainer.appendChild(dataOverlay);
     }
 
