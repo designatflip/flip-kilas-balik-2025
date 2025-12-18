@@ -442,7 +442,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 14) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#41666E";
+      textContainer.style.backgroundColor = "#3A5988";
       textContainer.textContent = "Kamu bisa jadiin belanjaan jadi cuan";
       contentWrapper.appendChild(textContainer);
     }
@@ -451,7 +451,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 15) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#41666E";
+      textContainer.style.backgroundColor = "#3A5988";
       textContainer.textContent = "Setiap rupiah berarti, dan kamu tau itu.";
       contentWrapper.appendChild(textContainer);
     }
@@ -460,7 +460,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 16) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#41666E";
+      textContainer.style.backgroundColor = "#3A5988";
       textContainer.textContent =
         "Skill yang kamu kuasai tahun ini adalah bertahan tapi tetep sayang diri sendiri.";
       contentWrapper.appendChild(textContainer);
@@ -470,7 +470,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 17) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#41666E";
+      textContainer.style.backgroundColor = "#3A5988";
       textContainer.textContent =
         "Jajan es krim pas lagi bad day, jalan-jalan sambil nikmatin angin sepoi-sepoi atau beli barang lucu yang bikin mood naik. ";
       contentWrapper.appendChild(textContainer);
@@ -480,7 +480,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 18) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#41666E";
+      textContainer.style.backgroundColor = "#3A5988";
       textContainer.textContent = "Small joys yang bikin tetap waras.";
       contentWrapper.appendChild(textContainer);
     }
@@ -489,7 +489,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 19) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#41666E";
+      textContainer.style.backgroundColor = "#3A5988";
       textContainer.textContent =
         "Kamu juga gak lupa buat nabung & investasi buat masa depan ";
       contentWrapper.appendChild(textContainer);
@@ -499,7 +499,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 20) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#41666E";
+      textContainer.style.backgroundColor = "#3A5988";
       textContainer.textContent =
         "Mungkin jumlahnya belum sesuai yang kamu mau, yang penting udah mulai";
       contentWrapper.appendChild(textContainer);
@@ -509,7 +509,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 21) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#41666E";
+      textContainer.style.backgroundColor = "#3A5988";
       textContainer.textContent =
         "Selain itu, kamu juga masih sempat berbagi buat orang lain";
       contentWrapper.appendChild(textContainer);
@@ -519,7 +519,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 22) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#41666E";
+      textContainer.style.backgroundColor = "#3A5988";
       textContainer.textContent =
         "Peduli itu bukan soal seberapa besar yang kamu kasih, tapi soal kamu masih ingat ada orang lain, meski kamu masih berjuang juga.";
       contentWrapper.appendChild(textContainer);
@@ -529,7 +529,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 23) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#41666E";
+      textContainer.style.backgroundColor = "#C7D7EE";
 
       textContainer.textContent = "Mungkin gak kerasa, tapi liat deh...";
       contentWrapper.appendChild(textContainer);
@@ -539,7 +539,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 24) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#8AC1C4";
+      textContainer.style.backgroundColor = "#C7D7EE";
+      textContainer.style.color = "#222222";
 
       textContainer.textContent =
         "Setelah diinget lagi, ternyata banyak banget kan, yang udah kamu lakuin?";
@@ -550,7 +551,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 25) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#8AC1C4";
+      textContainer.style.backgroundColor = "#C7D7EE";
+      textContainer.style.color = "#222222";
       textContainer.textContent =
         "Makasih ya udah gak menyerah, meski ada masanya pengen banget. ";
       contentWrapper.appendChild(textContainer);
@@ -560,7 +562,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 26) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#8AC1C4";
+      textContainer.style.backgroundColor = "#C7D7EE";
+      textContainer.style.color = "#222222";
       textContainer.textContent =
         "Kalau ada yang belum tercapai, kita coba lagi di tahun 2026.";
       contentWrapper.appendChild(textContainer);
@@ -570,7 +573,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 27) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#8AC1C4";
+      textContainer.style.backgroundColor = "#C7D7EE";
+      textContainer.style.color = "#222222";
       textContainer.textContent = "Salam cinta,  Flip 🫰🏻";
       contentWrapper.appendChild(textContainer);
     }
