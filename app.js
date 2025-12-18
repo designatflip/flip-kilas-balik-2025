@@ -424,7 +424,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const dividerContainer = document.createElement("div");
       dividerContainer.className = "image-container";
       const dividerImg = document.createElement("img");
-      dividerImg.src = "assets/divider.png";
+      dividerImg.src = "assets/asset-divider.png";
       dividerImg.alt = "Divider";
       dividerImg.loading = "lazy";
       dividerContainer.appendChild(dividerImg);
