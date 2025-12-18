@@ -290,7 +290,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 0) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.textContent = `1 Januari — 1 November 2025 \n Buat ${userName}`;
+      textContainer.textContent = `1 Januari — 1 Desember 2025 \n Buat ${userName}`;
       contentWrapper.appendChild(textContainer);
     }
 
@@ -607,6 +607,18 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   envelopeContainer.appendChild(navButtons);
   appContainer.appendChild(envelopeContainer);
+
+  // Create back button
+  const backButton = document.createElement("div");
+  backButton.className = "back-button";
+  backButton.innerHTML = "&lt;";
+  backButton.addEventListener("click", () => {
+    const win = window;
+    if (win.ReactNativeWebView) {
+      win.ReactNativeWebView.postMessage("exit-page");
+    }
+  });
+  appContainer.appendChild(backButton);
 
   root.appendChild(appContainer);
 });
