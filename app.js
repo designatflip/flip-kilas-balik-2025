@@ -134,7 +134,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     "assets/asset 12.png",
     "assets/asset 14.png",
     "assets/asset 15.png",
-    "assets/asset 16.png",
     "assets/asset 17.png",
     "assets/asset 18.png",
     "assets/asset 19.png",
@@ -180,8 +179,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       imageContainer.appendChild(amountOverlay);
     }
 
-    // Add flip deals and cashback data overlay on asset 17 (index 16)
-    if (index === 16) {
+    // Add flip deals and cashback data overlay on asset 17 (index 15)
+    if (index === 15) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
       dataOverlay.innerHTML = `
@@ -193,48 +192,48 @@ document.addEventListener("DOMContentLoaded", async function () {
       imageContainer.appendChild(dataOverlay);
     }
 
-    // Add ewallet topup count overlay on asset 19 (index 18)
-    if (index === 18) {
+    // Add ewallet topup count overlay on asset 19 (index 17)
+    if (index === 17) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
       dataOverlay.innerHTML = `<div style="font-size: 20px; margin-bottom: 10px;">ewallet_topup_count</div><strong>${ewalletTopupCount}</strong>`;
       imageContainer.appendChild(dataOverlay);
     }
 
-    // Add qris transaction count overlay on asset 20 (index 19)
-    if (index === 19) {
+    // Add qris transaction count overlay on asset 20 (index 18)
+    if (index === 18) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
       dataOverlay.innerHTML = `<div style="font-size: 20px; margin-bottom: 10px;">qris_transaction_count</div><strong>${qrisTransactionCount}</strong>`;
       imageContainer.appendChild(dataOverlay);
     }
 
-    // Add unit owned overlay on asset 21 (index 20)
-    if (index === 20) {
+    // Add unit owned overlay on asset 21 (index 19)
+    if (index === 19) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
       dataOverlay.innerHTML = `<div style="font-size: 20px; margin-bottom: 10px;">unit_owned</div><strong>${unitOwned}</strong>`;
       imageContainer.appendChild(dataOverlay);
     }
 
-    // Add profit share receiver overlay on asset 22 (index 21)
-    if (index === 21) {
+    // Add profit share receiver overlay on asset 22 (index 20)
+    if (index === 20) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
       dataOverlay.innerHTML = `<div style="font-size: 20px; margin-bottom: 10px;">profit_share_receiver</div><strong>${profitShareReceiver}</strong>`;
       imageContainer.appendChild(dataOverlay);
     }
 
-    // Add unique code donation overlay on asset 24 (index 23)
-    if (index === 23) {
+    // Add unique code donation overlay on asset 24 (index 22)
+    if (index === 22) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
       dataOverlay.innerHTML = `<div style="font-size: 20px; margin-bottom: 10px;">unique_code_donation_amount</div><strong>${uniqueCodeDonation}</strong>`;
       imageContainer.appendChild(dataOverlay);
     }
 
-    // Add data table overlay on asset 26 (index 25)
-    if (index === 25) {
+    // Add data table overlay on asset 26 (index 24)
+    if (index === 24) {
       const tableOverlay = document.createElement("div");
       tableOverlay.className = "table-overlay";
       tableOverlay.innerHTML = `
@@ -433,8 +432,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       // Add text after divider
       const dividerTextContainer = document.createElement("div");
       dividerTextContainer.className = "text-container";
-      dividerTextContainer.style.backgroundColor = "#1D2D44";
-      dividerTextContainer.textContent = "Kamu juga jago banget nemuin cara kreatif buat dapetin uang tambahan. ";
+      dividerTextContainer.style.backgroundColor = "#3A5988";
+      dividerTextContainer.textContent =
+        "Kamu juga jago banget nemuin cara kreatif buat dapetin uang tambahan. ";
       contentWrapper.appendChild(dividerTextContainer);
     }
 
@@ -443,22 +443,12 @@ document.addEventListener("DOMContentLoaded", async function () {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#41666E";
-      textContainer.textContent =
-        "Kamu juga jago banget nemuin cara kreatif buat dapetin uang tambahan. ";
-      contentWrapper.appendChild(textContainer);
-    }
-
-    // Add text after asset 16 (index 15)
-    if (index === 15) {
-      const textContainer = document.createElement("div");
-      textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#41666E";
       textContainer.textContent = "Kamu bisa jadiin belanjaan jadi cuan";
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 17 (index 16)
-    if (index === 16) {
+    // Add text after asset 17 (index 15)
+    if (index === 15) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#41666E";
@@ -466,8 +456,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 18 (index 17)
-    if (index === 17) {
+    // Add text after asset 18 (index 16)
+    if (index === 16) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#41666E";
@@ -476,8 +466,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 19 (index 18)
-    if (index === 18) {
+    // Add text after asset 19 (index 17)
+    if (index === 17) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#41666E";
@@ -486,8 +476,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 20 (index 19)
-    if (index === 19) {
+    // Add text after asset 20 (index 18)
+    if (index === 18) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#41666E";
@@ -495,8 +485,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 21 (index 20)
-    if (index === 20) {
+    // Add text after asset 21 (index 19)
+    if (index === 19) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#41666E";
@@ -505,8 +495,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 22 (index 21)
-    if (index === 21) {
+    // Add text after asset 22 (index 20)
+    if (index === 20) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#41666E";
@@ -515,8 +505,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 23 (index 22)
-    if (index === 22) {
+    // Add text after asset 23 (index 21)
+    if (index === 21) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#41666E";
@@ -525,8 +515,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 24 (index 23)
-    if (index === 23) {
+    // Add text after asset 24 (index 22)
+    if (index === 22) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#41666E";
@@ -535,8 +525,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 25 (index 24)
-    if (index === 24) {
+    // Add text after asset 25 (index 23)
+    if (index === 23) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#41666E";
@@ -545,8 +535,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 26 (index 25)
-    if (index === 25) {
+    // Add text after asset 26 (index 24)
+    if (index === 24) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#8AC1C4";
@@ -556,8 +546,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 27 (index 26)
-    if (index === 26) {
+    // Add text after asset 27 (index 25)
+    if (index === 25) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#8AC1C4";
@@ -566,8 +556,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 28 (index 27)
-    if (index === 27) {
+    // Add text after asset 28 (index 26)
+    if (index === 26) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#8AC1C4";
@@ -576,8 +566,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       contentWrapper.appendChild(textContainer);
     }
 
-    // Add text after asset 29 (index 28)
-    if (index === 28) {
+    // Add text after asset 29 (index 27)
+    if (index === 27) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#8AC1C4";
