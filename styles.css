@@ -8,7 +8,7 @@ body {
   font-family: 'Gaegu', cursive;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f5f5;
+  background-color: #1D2D44;
   overflow-x: hidden;
 }
 
@@ -21,7 +21,7 @@ body {
 .app-container {
   width: 100%;
   max-width: 480px;
-  background-color: #1B3238;
+  background-color: #1D2D44;
   min-height: 100vh;
 }
 
@@ -140,11 +140,11 @@ body {
 
 .nav-buttons {
   position: absolute;
+  bottom: 0;
   /* top: 100px; */
   left: 0;
   right: 0;
   display: flex;
-  bottom: 0;
   justify-content: space-between;
   padding: 20px 30px;
   pointer-events: auto;
