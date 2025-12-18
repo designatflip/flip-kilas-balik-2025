@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 2) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#1A2022";
+      textContainer.style.backgroundColor = "#1D2D44";
 
       textContainer.textContent = "Banyak hal yang udah dilewati tahun ini";
       contentWrapper.appendChild(textContainer);
