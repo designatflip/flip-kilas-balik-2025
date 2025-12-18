@@ -628,9 +628,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   appContainer.appendChild(envelopeContainer);
 
   // Create back button
-  const backButton = document.createElement("div");
+  const backButton = document.createElement("img");
+  backButton.src = "assets/navigation/nav_back_btn.png";
+  backButton.alt = "Back";
   backButton.className = "back-button";
-  backButton.innerHTML = "&lt;";
   backButton.addEventListener("click", () => {
     const win = window;
     if (win.ReactNativeWebView) {
