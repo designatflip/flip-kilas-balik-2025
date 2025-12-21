@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - Flip Kilas Balik 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-page">
+        <img src="assets/failed-to-load.png" alt="Failed to Load" class="error-illustration">
+        <div class="error-text">Hmm suratnya gagal dimuat. Coba lagi ya</div>
+    </div>
+
+    <div class="sticky-back-envelope">
+        <img src="assets/navigation/back-envelope.png" alt="Back Envelope">
+    </div>
+
+    <div class="sticky-envelope">
+        <img src="assets/navigation/front-envelope.png" alt="Envelope">
+        <div class="nav-buttons">
+            <img src="assets/navigation/close-button.png" alt="Close" class="nav-btn close-btn" id="closeBtn">
+            <img src="assets/navigation/reload_btn.png" alt="Reload" class="nav-btn reload-btn" id="reloadBtn">
+            <img src="assets/navigation/Gallery_btn.png" alt="Gallery" class="nav-btn gallery-btn">
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('closeBtn').addEventListener('click', () => {
+            if (window.ReactNativeWebView) {
+                window.ReactNativeWebView.postMessage('exit-page');
+            }
+        });
+
+        document.getElementById('reloadBtn').addEventListener('click', () => {
+            window.location.href = window.location.origin + '/';
+        });
+    </script>
+</body>
+</html>

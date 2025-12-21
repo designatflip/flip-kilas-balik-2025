@@ -23,9 +23,33 @@ body {
   max-width: 480px;
   background-color: #1D2D44;
   min-height: 100vh;
+  position: relative;
+}
+
+/* Background image - fixed and fades on scroll */
+.background-image {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-out;
+}
+
+.background-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .content-wrapper {
+  padding-right: 12px;
+  padding-left: 12px;
   margin-top: 600px;
   margin-bottom: 80px;
   width: 100%;
@@ -129,7 +153,7 @@ body {
   transform: translateX(-50%);
   width: 100%;
   max-width: 480px;
-  z-index: 1002;
+  z-index: 10002;
   pointer-events: none;
 }
 
@@ -137,6 +161,7 @@ body {
   width: 100%;
   height: auto;
   display: block;
+  pointer-events: none;
 }
 
 .nav-buttons {
@@ -157,6 +182,7 @@ body {
   cursor: pointer;
   transition: transform 0.2s;
   object-fit: contain;
+  pointer-events: auto;
 }
 
 .nav-btn:hover {
@@ -172,25 +198,265 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Back button */
-.back-button {
+/* Scroll indicator - bouncing arrow and text */
+.scroll-indicator {
   position: fixed;
-  top: 60px;
-  left: 20px;
-  width: auto;
-  height: 50px;
-  cursor: pointer;
-  z-index: 1003;
-  transition: transform 0.2s;
-  object-fit: contain;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 998;
+  text-align: center;
+  transition: opacity 0.5s ease-out;
+  pointer-events: none;
+  max-width: 480px;
 }
 
-.back-button:hover {
+.scroll-indicator .arrow {
+  font-size: 48px;
+  color: white;
+  animation: bounce 2s infinite;
+  margin-bottom: 16px;
+}
+
+.scroll-indicator .text {
+  font-size: 24px;
+  color: white;
+  font-weight: 400;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Loading screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #1D2D44;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.8s ease-out;
+}
+
+.loading-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-illustration {
+  width: 280px;
+  height: auto;
+  margin-bottom: 40px;
+}
+
+.loading-text {
+  color: white;
+  font-size: 18px;
+  margin-bottom: 30px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.progress-bar-container {
+  width: 280px;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #5A7FA8 0%, #8BA8C8 100%);
+  border-radius: 10px;
+  transition: width 0.3s ease-out;
+  width: 0%;
+}
+
+.progress-percentage {
+  color: white;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+/* Error page */
+.error-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #1D2D44;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.error-illustration {
+  width: 280px;
+  height: auto;
+  margin-bottom: 40px;
+}
+
+.error-text {
+  color: white;
+  font-size: 18px;
+  text-align: center;
+  line-height: 1.5;
+  padding: 0 20px;
+}
+
+/* UID Not Found page */
+.uid-not-found-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #1D2D44;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9998;
+}
+
+.uid-not-found-illustration {
+  width: 280px;
+  height: auto;
+  margin-bottom: 40px;
+}
+
+.uid-not-found-text {
+  color: white;
+  font-size: 18px;
+  text-align: center;
+  line-height: 1.5;
+  padding: 0 20px;
+}
+
+/* Gallery page */
+.gallery-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #1D2D44;
+  z-index: 10003;
+  overflow-y: auto;
+  display: none;
+}
+
+.gallery-page.active {
+  display: block;
+}
+
+.gallery-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 40px 20px 120px 20px;
+  min-height: 100vh;
+}
+
+.gallery-title {
+  color: white;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.wallpaper-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.wallpaper-item {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.wallpaper-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.download-btn-container {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 10;
+}
+
+.wallpaper-download-btn {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.wallpaper-download-btn:hover {
   transform: scale(1.1);
 }
 
-.back-button:active {
+.wallpaper-download-btn:active {
   transform: scale(0.95);
+}
+
+/* Download progress loader */
+.download-progress {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: conic-gradient(#5A7FA8 0deg, transparent 0deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.download-progress::before {
+  content: '';
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #1D2D44;
+}
+
+.download-progress-text {
+  position: absolute;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  z-index: 1;
 }
 
 /* Mobile optimization */
