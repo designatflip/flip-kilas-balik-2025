@@ -78,7 +78,9 @@ document
           }
           if (data.amount_saved !== null && data.amount_saved !== undefined) {
             amountSavedRaw = data.amount_saved;
-            amountSaved = `Rp ${data.amount_saved.toLocaleString("id-ID", { maximumFractionDigits: 0 })}`;
+            amountSaved = `Rp ${data.amount_saved.toLocaleString("id-ID", {
+              maximumFractionDigits: 0,
+            })}`;
           }
           if (
             data.flip_deals_purchase_trx !== null &&
@@ -506,60 +508,79 @@ document
         const dataOverlay = document.createElement("div");
         dataOverlay.className = "amount-overlay";
         const totalDonation = uniqueCodeDonationRaw + donationAmount;
-        const totalDonationFormatted = `Rp ${totalDonation.toLocaleString("id-ID", { maximumFractionDigits: 0 })}`;
+        const totalDonationFormatted = `Rp ${totalDonation.toLocaleString(
+          "id-ID",
+          { maximumFractionDigits: 0 }
+        )}`;
         dataOverlay.innerHTML = `<strong style="margin-bottom: 82px; display: block; font-family: 'Sometype Mono', monospace;">${totalDonationFormatted}</strong>`;
         imageContainer.appendChild(dataOverlay);
       }
 
-      // Add data table overlay on asset 26 (index 24)
+      // Add data stamp overlays on asset 26 (index 24)
       if (index === 24) {
-        const tableOverlay = document.createElement("div");
-        tableOverlay.className = "table-overlay";
-        tableOverlay.innerHTML = `
-        <table style="width: 100%; color: white; font-size: 14px; border-collapse: collapse; font-family: 'Sometype Mono', monospace;">
-          <tr>
-            <td style="padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">qris_transaction_count</td>
-            <td style="padding: 8px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.2);"><strong>${qrisTransactionCountRaw}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">ewallet_topup_count</td>
-            <td style="padding: 8px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.2);"><strong>${ewalletTopupCountRaw}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">flip_deals_purchase_trx</td>
-            <td style="padding: 8px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.2);"><strong>${flipDealsPurchaseRaw}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">cashback_received_amount</td>
-            <td style="padding: 8px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.2);"><strong>${cashbackReceivedRaw}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">amount_saved</td>
-            <td style="padding: 8px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.2);"><strong>${amountSavedRaw}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">gold_transaction_count</td>
-            <td style="padding: 8px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.2);"><strong>${goldTransactionCount}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">unit_owned</td>
-            <td style="padding: 8px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.2);"><strong>${unitOwnedRaw}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">profit_share_receiver</td>
-            <td style="padding: 8px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.2);"><strong>${profitShareReceiverRaw}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">unique_code_donation_amount</td>
-            <td style="padding: 8px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.2);"><strong>${uniqueCodeDonationRaw}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; text-align: left;">donation_amount</td>
-            <td style="padding: 8px; text-align: right;"><strong>${donationAmount}</strong></td>
-          </tr>
-        </table>
-      `;
-        imageContainer.appendChild(tableOverlay);
+        const stampOverlay = document.createElement("div");
+        stampOverlay.className = "stamp-overlay";
+        stampOverlay.style.cssText = `
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          font-family: 'Sometype Mono', monospace;
+          color: #1B3238;
+        `;
+
+        // Helper function to create stamp data with absolute positioning
+        // Positions are in percentages (left, bottom from container)
+        const createStamp = (value, label, left, bottom) => {
+          return `
+            <div style="position: absolute; left: ${left}%; bottom: ${bottom}%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; text-align: center;">
+              <div style="font-size: clamp(16px, 4vw, 24px); font-weight: bold; margin-bottom: 2px;">${value}</div>
+              <div style="font-size: clamp(8px, 2vw, 11px); line-height: 1.2; white-space: nowrap;">${label}</div>
+            </div>
+          `;
+        };
+
+        // Format currency values with Rp and thousand separators
+        const formatCurrency = (value) => {
+          return `Rp${Math.floor(value).toLocaleString("id-ID")}`;
+        };
+
+        // Position each stamp at bottom center of its stamp box
+        // Format: createStamp(value, label, left%, bottom%)
+        stampOverlay.innerHTML = `
+          ${createStamp(
+            formatCurrency(amountSavedRaw),
+            "Hemat pakai Flip",
+            33,
+            73
+          )}
+          ${createStamp(ewalletTopupCountRaw + "x", "Top up E-Wallet", 77, 73)}
+          ${createStamp(flipDealsPurchaseRaw + "x", "Flip Deals", 23, 52)}
+          ${createStamp(
+            formatCurrency(cashbackReceivedRaw),
+            "Cashback Flip Deals",
+            68,
+            52
+          )}
+          ${createStamp(qrisTransactionCountRaw + "x", "QRIS", 19, 32)}
+          ${createStamp(unitOwnedRaw + "gr", "Beli Emas", 46, 32)}
+          ${createStamp(
+            formatCurrency(uniqueCodeDonationRaw),
+            "Donasi Kode Unik",
+            77,
+            32
+          )}
+          ${createStamp(
+            formatCurrency(profitShareReceiverRaw),
+            "Bagi Hasil SuperFlip",
+            28,
+            11
+          )}
+          ${createStamp(formatCurrency(donationAmount), "Total Donasi", 72, 11)}
+        `;
+
+        imageContainer.appendChild(stampOverlay);
       }
 
       contentWrapper.appendChild(imageContainer);
@@ -976,7 +997,9 @@ document
             // Fetch the image
             const response = await fetch(wallpaperSrc);
             const blob = await response.blob();
-            const file = new File([blob], `wallpaper-${index + 1}.png`, { type: "image/png" });
+            const file = new File([blob], `wallpaper-${index + 1}.png`, {
+              type: "image/png",
+            });
 
             if (navigator.share) {
               await navigator.share({
@@ -1094,7 +1117,8 @@ document
       // Function to generate share image
       const generateShareImage = async () => {
         // Find the image container for asset 26 (index 25)
-        const asset26Container = document.querySelectorAll(".image-container")[25];
+        const asset26Container =
+          document.querySelectorAll(".image-container")[25];
         if (!asset26Container) return;
 
         const img = asset26Container.querySelector("img");
@@ -1118,61 +1142,62 @@ document
         // Draw the image
         ctx.drawImage(img, 0, 0);
 
-        // Draw the table overlay
-        const tableOverlay = asset26Container.querySelector(".table-overlay");
-        if (tableOverlay) {
-          // Get table overlay dimensions and position
-          const overlayRect = tableOverlay.getBoundingClientRect();
-          const imgRect = img.getBoundingClientRect();
+        // Draw the stamp overlay data
+        const stampOverlay = asset26Container.querySelector(".stamp-overlay");
+        if (stampOverlay) {
+          // Helper function to draw stamp data at absolute positions
+          // leftPercent and bottomPercent are percentages of canvas dimensions
+          const drawStamp = (value, label, leftPercent, bottomPercent) => {
+            const x = (canvas.width * leftPercent) / 100;
+            const y = canvas.height - (canvas.height * bottomPercent) / 100;
 
-          // Calculate scale ratio
-          const scaleX = canvas.width / imgRect.width;
-          const scaleY = canvas.height / imgRect.height;
+            // Set text properties
+            ctx.fillStyle = "#1B3238";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
 
-          // Draw semi-transparent background for table
-          const padding = 20 * scaleX;
-          const tableWidth = (overlayRect.width * scaleX);
-          const tableX = (canvas.width - tableWidth) / 2;
-          const tableY = (canvas.height - (overlayRect.height * scaleY)) / 2;
+            // Draw label first (at the bottom)
+            const labelFontSize = Math.max(11, canvas.width * 0.022);
+            ctx.font = `${labelFontSize}px 'Sometype Mono', monospace`;
+            ctx.fillText(label, x, y);
 
-          ctx.fillStyle = "rgba(27, 50, 56, 0.9)";
-          ctx.roundRect(tableX, tableY, tableWidth, overlayRect.height * scaleY, 10 * scaleX);
-          ctx.fill();
+            // Draw value above label (bold, larger)
+            const valueFontSize = Math.max(24, canvas.width * 0.048);
+            ctx.font = `bold ${valueFontSize}px 'Sometype Mono', monospace`;
+            ctx.fillText(value, x, y - labelFontSize - 4);
+          };
 
-          // Draw table text
-          ctx.fillStyle = "white";
-          ctx.font = `${14 * scaleX}px 'Sometype Mono', monospace`;
-          ctx.textAlign = "left";
+          // Format currency values with Rp and thousand separators
+          const formatCurrency = (value) => {
+            return `Rp${Math.floor(value).toLocaleString("id-ID")}`;
+          };
 
-          const rowHeight = 36 * scaleY;
-          let currentY = tableY + padding + (16 * scaleY);
-
-          // Draw table rows
-          const tableData = [
-            ["qris_transaction_count", qrisTransactionCountRaw],
-            ["ewallet_topup_count", ewalletTopupCountRaw],
-            ["flip_deals_purchase_trx", flipDealsPurchaseRaw],
-            ["cashback_received_amount", cashbackReceivedRaw],
-            ["amount_saved", amountSavedRaw],
-            ["gold_transaction_count", goldTransactionCount],
-            ["unit_owned", unitOwnedRaw],
-            ["profit_share_receiver", profitShareReceiverRaw],
-            ["unique_code_donation_amount", uniqueCodeDonationRaw],
-            ["donation_amount", donationAmount],
-          ];
-
-          tableData.forEach(([label, value]) => {
-            ctx.fillStyle = "white";
-            ctx.textAlign = "left";
-            ctx.fillText(label, tableX + padding, currentY);
-
-            ctx.textAlign = "right";
-            ctx.font = `bold ${14 * scaleX}px 'Sometype Mono', monospace`;
-            ctx.fillText(String(value), tableX + tableWidth - padding, currentY);
-
-            ctx.font = `${14 * scaleX}px 'Sometype Mono', monospace`;
-            currentY += rowHeight;
-          });
+          // Draw all stamps at their absolute positions (matching DOM overlay)
+          // Format: drawStamp(value, label, left%, bottom%)
+          drawStamp(formatCurrency(amountSavedRaw), "Hemat pakai Flip", 33, 73);
+          drawStamp(ewalletTopupCountRaw + "x", "Top up E-Wallet", 77, 73);
+          drawStamp(flipDealsPurchaseRaw + "x", "Flip Deals", 23, 52);
+          drawStamp(
+            formatCurrency(cashbackReceivedRaw),
+            "Cashback Flip Deals",
+            68,
+            52
+          );
+          drawStamp(qrisTransactionCountRaw + "x", "QRIS", 19, 32);
+          drawStamp(unitOwnedRaw + "gr", "Beli Emas", 46, 32);
+          drawStamp(
+            formatCurrency(uniqueCodeDonationRaw),
+            "Donasi Kode Unik",
+            77,
+            32
+          );
+          drawStamp(
+            formatCurrency(profitShareReceiverRaw),
+            "Bagi Hasil SuperFlip",
+            28,
+            11
+          );
+          drawStamp(formatCurrency(donationAmount), "Total Donasi", 72, 11);
         }
       };
 
@@ -1205,7 +1230,9 @@ document
       instagramBtn.addEventListener("click", async () => {
         const dataUrl = canvas.toDataURL("image/png");
         const blob = await (await fetch(dataUrl)).blob();
-        const file = new File([blob], "flip-kilas-balik-2025.png", { type: "image/png" });
+        const file = new File([blob], "flip-kilas-balik-2025.png", {
+          type: "image/png",
+        });
 
         if (navigator.share) {
           try {
@@ -1230,7 +1257,9 @@ document
       whatsappBtn.addEventListener("click", async () => {
         const dataUrl = canvas.toDataURL("image/png");
         const blob = await (await fetch(dataUrl)).blob();
-        const file = new File([blob], "flip-kilas-balik-2025.png", { type: "image/png" });
+        const file = new File([blob], "flip-kilas-balik-2025.png", {
+          type: "image/png",
+        });
 
         if (navigator.share) {
           try {
@@ -1255,7 +1284,9 @@ document
       xBtn.addEventListener("click", async () => {
         const dataUrl = canvas.toDataURL("image/png");
         const blob = await (await fetch(dataUrl)).blob();
-        const file = new File([blob], "flip-kilas-balik-2025.png", { type: "image/png" });
+        const file = new File([blob], "flip-kilas-balik-2025.png", {
+          type: "image/png",
+        });
 
         if (navigator.share) {
           try {
@@ -1275,7 +1306,9 @@ document
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
-          alert("Please upload this image to X with the caption: Checkout my Flip Year in Review #kilasbalik2025");
+          alert(
+            "Please upload this image to X with the caption: Checkout my Flip Year in Review #kilasbalik2025"
+          );
         }
       });
 
