@@ -78,7 +78,7 @@ document
           }
           if (data.amount_saved !== null && data.amount_saved !== undefined) {
             amountSavedRaw = data.amount_saved;
-            amountSaved = `Rp ${data.amount_saved.toLocaleString("id-ID")}`;
+            amountSaved = `Rp ${data.amount_saved.toLocaleString("id-ID", { maximumFractionDigits: 0 })}`;
           }
           if (
             data.flip_deals_purchase_trx !== null &&
@@ -93,7 +93,8 @@ document
           ) {
             cashbackReceivedRaw = data.cashback_received_amount;
             cashbackReceived = `Rp ${data.cashback_received_amount.toLocaleString(
-              "id-ID"
+              "id-ID",
+              { maximumFractionDigits: 0 }
             )}`;
           }
           if (
@@ -120,7 +121,8 @@ document
           ) {
             profitShareReceiverRaw = data.profit_share_receiver;
             profitShareReceiver = `Rp ${data.profit_share_receiver.toLocaleString(
-              "id-ID"
+              "id-ID",
+              { maximumFractionDigits: 0 }
             )}`;
           }
           if (
@@ -452,7 +454,7 @@ document
       if (index === 12) {
         const amountOverlay = document.createElement("div");
         amountOverlay.className = "amount-overlay";
-        amountOverlay.innerHTML = `<strong style="margin-bottom: -40px; display: block;">${amountSaved}</strong>`;
+        amountOverlay.innerHTML = `<strong style="margin-bottom: -24px; display: block; font-family: 'Sometype Mono', monospace;">${amountSaved}</strong>`;
         imageContainer.appendChild(amountOverlay);
       }
 
@@ -461,8 +463,8 @@ document
         const dataOverlay = document.createElement("div");
         dataOverlay.className = "amount-overlay";
         dataOverlay.innerHTML = `
-        <strong style="margin-bottom: 36px; display: block;">${flipDealsPurchase}</strong>
-        <strong style="margin-bottom: 80px; display: block;">${cashbackReceived}</strong>
+        <strong style="margin-bottom: 20px; display: block; font-family: 'Sometype Mono', monospace;">${flipDealsPurchase}</strong>
+        <strong style="margin-bottom: 50px; display: block; font-family: 'Sometype Mono', monospace;">${cashbackReceived}</strong>
       `;
         imageContainer.appendChild(dataOverlay);
       }
@@ -471,7 +473,7 @@ document
       if (index === 17) {
         const dataOverlay = document.createElement("div");
         dataOverlay.className = "amount-overlay";
-        dataOverlay.innerHTML = `<strong style="margin-bottom: 110px; display: block;">${ewalletTopupCount}</strong>`;
+        dataOverlay.innerHTML = `<strong style="margin-bottom: 82px; display: block; font-family: 'Sometype Mono', monospace;">${ewalletTopupCount}</strong>`;
         imageContainer.appendChild(dataOverlay);
       }
 
@@ -479,7 +481,7 @@ document
       if (index === 18) {
         const dataOverlay = document.createElement("div");
         dataOverlay.className = "amount-overlay";
-        dataOverlay.innerHTML = `<strong style="margin-bottom: 110px; display: block;">${qrisTransactionCount}</strong>`;
+        dataOverlay.innerHTML = `<strong style="margin-bottom: 82px; display: block; font-family: 'Sometype Mono', monospace;">${qrisTransactionCount}</strong>`;
         imageContainer.appendChild(dataOverlay);
       }
 
@@ -487,7 +489,7 @@ document
       if (index === 19) {
         const dataOverlay = document.createElement("div");
         dataOverlay.className = "amount-overlay";
-        dataOverlay.innerHTML = `<strong style="margin-bottom: 110px; display: block;">${unitOwned}</strong>`;
+        dataOverlay.innerHTML = `<strong style="margin-bottom: 82px; display: block; font-family: 'Sometype Mono', monospace;">${unitOwned}</strong>`;
         imageContainer.appendChild(dataOverlay);
       }
 
@@ -495,7 +497,7 @@ document
       if (index === 20) {
         const dataOverlay = document.createElement("div");
         dataOverlay.className = "amount-overlay";
-        dataOverlay.innerHTML = `<strong style="margin-bottom: 110px; display: block;">${profitShareReceiver}</strong>`;
+        dataOverlay.innerHTML = `<strong style="margin-bottom: 82px; display: block; font-family: 'Sometype Mono', monospace;">${profitShareReceiver}</strong>`;
         imageContainer.appendChild(dataOverlay);
       }
 
@@ -503,7 +505,9 @@ document
       if (index === 22) {
         const dataOverlay = document.createElement("div");
         dataOverlay.className = "amount-overlay";
-        dataOverlay.innerHTML = `<strong style="margin-bottom: 110px; display: block;">${uniqueCodeDonation}</strong>`;
+        const totalDonation = uniqueCodeDonationRaw + donationAmount;
+        const totalDonationFormatted = `Rp ${totalDonation.toLocaleString("id-ID", { maximumFractionDigits: 0 })}`;
+        dataOverlay.innerHTML = `<strong style="margin-bottom: 82px; display: block; font-family: 'Sometype Mono', monospace;">${totalDonationFormatted}</strong>`;
         imageContainer.appendChild(dataOverlay);
       }
 
@@ -512,7 +516,7 @@ document
         const tableOverlay = document.createElement("div");
         tableOverlay.className = "table-overlay";
         tableOverlay.innerHTML = `
-        <table style="width: 100%; color: white; font-size: 14px; border-collapse: collapse;">
+        <table style="width: 100%; color: white; font-size: 14px; border-collapse: collapse; font-family: 'Sometype Mono', monospace;">
           <tr>
             <td style="padding: 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2);">qris_transaction_count</td>
             <td style="padding: 8px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.2);"><strong>${qrisTransactionCountRaw}</strong></td>
@@ -1105,6 +1109,259 @@ document
     galleryBtn.addEventListener("click", () => {
       galleryPage.classList.add("active");
       galleryBtn.src = "assets/navigation/Gallery_btn_home.png";
+    });
+
+    // Create share popup
+    const createSharePopup = () => {
+      const sharePopup = document.createElement("div");
+      sharePopup.className = "share-popup";
+      sharePopup.id = "sharePopup";
+
+      const sharePopupContent = document.createElement("div");
+      sharePopupContent.className = "share-popup-content";
+
+      const shareTitle = document.createElement("div");
+      shareTitle.className = "share-popup-title";
+      shareTitle.textContent = "Where do you want to share this content?";
+
+      const sharePreviewContainer = document.createElement("div");
+      sharePreviewContainer.className = "share-preview-container";
+
+      // Create canvas to capture asset 26 with overlay
+      const canvas = document.createElement("canvas");
+      sharePreviewContainer.appendChild(canvas);
+
+      // Function to generate share image
+      const generateShareImage = async () => {
+        // Find the image container for asset 26 (index 25)
+        const asset26Container = document.querySelectorAll(".image-container")[25];
+        if (!asset26Container) return;
+
+        const img = asset26Container.querySelector("img");
+        if (!img) return;
+
+        // Wait for image to load
+        await new Promise((resolve) => {
+          if (img.complete) {
+            resolve();
+          } else {
+            img.onload = resolve;
+          }
+        });
+
+        // Set canvas dimensions to match image
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+
+        const ctx = canvas.getContext("2d");
+
+        // Draw the image
+        ctx.drawImage(img, 0, 0);
+
+        // Draw the table overlay
+        const tableOverlay = asset26Container.querySelector(".table-overlay");
+        if (tableOverlay) {
+          // Get table overlay dimensions and position
+          const overlayRect = tableOverlay.getBoundingClientRect();
+          const imgRect = img.getBoundingClientRect();
+
+          // Calculate scale ratio
+          const scaleX = canvas.width / imgRect.width;
+          const scaleY = canvas.height / imgRect.height;
+
+          // Draw semi-transparent background for table
+          const padding = 20 * scaleX;
+          const tableWidth = (overlayRect.width * scaleX);
+          const tableX = (canvas.width - tableWidth) / 2;
+          const tableY = (canvas.height - (overlayRect.height * scaleY)) / 2;
+
+          ctx.fillStyle = "rgba(27, 50, 56, 0.9)";
+          ctx.roundRect(tableX, tableY, tableWidth, overlayRect.height * scaleY, 10 * scaleX);
+          ctx.fill();
+
+          // Draw table text
+          ctx.fillStyle = "white";
+          ctx.font = `${14 * scaleX}px 'Sometype Mono', monospace`;
+          ctx.textAlign = "left";
+
+          const rowHeight = 36 * scaleY;
+          let currentY = tableY + padding + (16 * scaleY);
+
+          // Draw table rows
+          const tableData = [
+            ["qris_transaction_count", qrisTransactionCountRaw],
+            ["ewallet_topup_count", ewalletTopupCountRaw],
+            ["flip_deals_purchase_trx", flipDealsPurchaseRaw],
+            ["cashback_received_amount", cashbackReceivedRaw],
+            ["amount_saved", amountSavedRaw],
+            ["gold_transaction_count", goldTransactionCount],
+            ["unit_owned", unitOwnedRaw],
+            ["profit_share_receiver", profitShareReceiverRaw],
+            ["unique_code_donation_amount", uniqueCodeDonationRaw],
+            ["donation_amount", donationAmount],
+          ];
+
+          tableData.forEach(([label, value]) => {
+            ctx.fillStyle = "white";
+            ctx.textAlign = "left";
+            ctx.fillText(label, tableX + padding, currentY);
+
+            ctx.textAlign = "right";
+            ctx.font = `bold ${14 * scaleX}px 'Sometype Mono', monospace`;
+            ctx.fillText(String(value), tableX + tableWidth - padding, currentY);
+
+            ctx.font = `${14 * scaleX}px 'Sometype Mono', monospace`;
+            currentY += rowHeight;
+          });
+        }
+      };
+
+      // Generate image when popup opens
+      sharePopup.addEventListener("transitionend", () => {
+        if (sharePopup.classList.contains("active")) {
+          generateShareImage();
+        }
+      });
+
+      const shareOptions = document.createElement("div");
+      shareOptions.className = "share-options";
+
+      // Instagram option
+      const instagramBtn = document.createElement("div");
+      instagramBtn.className = "share-option-btn";
+      instagramBtn.innerHTML = `
+        <div class="share-option-icon">📷</div>
+        <div class="share-option-label">Instagram</div>
+      `;
+      instagramBtn.addEventListener("click", async () => {
+        const dataUrl = canvas.toDataURL("image/png");
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob], "flip-kilas-balik-2025.png", { type: "image/png" });
+
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: "Flip Kilas Balik 2025",
+              text: "Check out my Flip year in review!",
+            });
+          } catch (err) {
+            console.error("Error sharing:", err);
+          }
+        }
+      });
+
+      // WhatsApp option
+      const whatsappBtn = document.createElement("div");
+      whatsappBtn.className = "share-option-btn";
+      whatsappBtn.innerHTML = `
+        <div class="share-option-icon">💬</div>
+        <div class="share-option-label">WhatsApp</div>
+      `;
+      whatsappBtn.addEventListener("click", async () => {
+        const dataUrl = canvas.toDataURL("image/png");
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob], "flip-kilas-balik-2025.png", { type: "image/png" });
+
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: "Flip Kilas Balik 2025",
+              text: "Check out my Flip year in review!",
+            });
+          } catch (err) {
+            console.error("Error sharing:", err);
+          }
+        }
+      });
+
+      // X (Twitter) option
+      const xBtn = document.createElement("div");
+      xBtn.className = "share-option-btn";
+      xBtn.innerHTML = `
+        <div class="share-option-icon">𝕏</div>
+        <div class="share-option-label">X (Twitter)</div>
+      `;
+      xBtn.addEventListener("click", async () => {
+        const dataUrl = canvas.toDataURL("image/png");
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob], "flip-kilas-balik-2025.png", { type: "image/png" });
+
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: "Flip Kilas Balik 2025",
+              text: "Checkout my Flip Year in Review #kilasbalik2025",
+            });
+          } catch (err) {
+            console.error("Error sharing:", err);
+          }
+        } else {
+          // Fallback: download the image if Web Share API is not supported
+          const link = document.createElement("a");
+          link.href = dataUrl;
+          link.download = "flip-kilas-balik-2025.png";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          alert("Please upload this image to X with the caption: Checkout my Flip Year in Review #kilasbalik2025");
+        }
+      });
+
+      // Download option
+      const downloadBtn = document.createElement("div");
+      downloadBtn.className = "share-option-btn";
+      downloadBtn.innerHTML = `
+        <div class="share-option-icon">⬇️</div>
+        <div class="share-option-label">Download</div>
+      `;
+      downloadBtn.addEventListener("click", () => {
+        const dataUrl = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = "flip-kilas-balik-2025.png";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+
+      shareOptions.appendChild(instagramBtn);
+      shareOptions.appendChild(whatsappBtn);
+      shareOptions.appendChild(xBtn);
+      shareOptions.appendChild(downloadBtn);
+
+      const closeBtn = document.createElement("button");
+      closeBtn.className = "share-close-btn";
+      closeBtn.textContent = "Close";
+      closeBtn.addEventListener("click", () => {
+        sharePopup.classList.remove("active");
+      });
+
+      sharePopupContent.appendChild(shareTitle);
+      sharePopupContent.appendChild(sharePreviewContainer);
+      sharePopupContent.appendChild(shareOptions);
+      sharePopupContent.appendChild(closeBtn);
+
+      sharePopup.appendChild(sharePopupContent);
+
+      // Close popup when clicking outside
+      sharePopup.addEventListener("click", (e) => {
+        if (e.target === sharePopup) {
+          sharePopup.classList.remove("active");
+        }
+      });
+
+      document.body.appendChild(sharePopup);
+      return sharePopup;
+    };
+
+    const sharePopup = createSharePopup();
+
+    // Share button click handler
+    shareBtn.addEventListener("click", () => {
+      sharePopup.classList.add("active");
     });
 
     // Handle scroll effects for background fade and scroll indicator

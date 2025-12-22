@@ -172,7 +172,7 @@ body {
   right: 0;
   display: flex;
   justify-content: space-between;
-  padding: 20px 30px;
+  padding: 14px 22px;
   pointer-events: auto;
 }
 
@@ -457,6 +457,122 @@ html {
   font-size: 10px;
   font-weight: bold;
   z-index: 1;
+}
+
+/* Share popup */
+.share-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 10004;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.share-popup.active {
+  display: flex;
+}
+
+.share-popup-content {
+  background-color: #1D2D44;
+  border-radius: 16px;
+  padding: 24px 16px;
+  max-width: 400px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.share-popup-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.share-preview-container {
+  width: 100%;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.1);
+  max-height: 300px;
+}
+
+.share-preview-container canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.share-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.share-option-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+}
+
+.share-option-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.share-option-btn:active {
+  transform: scale(0.95);
+}
+
+.share-option-icon {
+  font-size: 24px;
+}
+
+.share-option-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.share-close-btn {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 14px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.share-close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.share-close-btn:active {
+  transform: scale(0.98);
 }
 
 /* Mobile optimization */
