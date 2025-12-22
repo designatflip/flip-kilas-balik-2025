@@ -53,8 +53,8 @@ document
     let uniqueCodeDonationRaw = 0;
     let donationAmount = 0;
 
-    // Variable to track if UID was found
-    let uidNotFound = false;
+    // Variable to track if there was an error loading data
+    let dataLoadError = false;
 
     if (uid && supabase) {
       try {
@@ -68,10 +68,8 @@ document
 
         if (error) {
           console.error("Error fetching user:", error);
-          // Check if error is because UID not found (PGRST116 is "no rows returned")
-          if (error.code === "PGRST116" || error.message.includes("no rows")) {
-            uidNotFound = true;
-          }
+          // Any error (including UID not found) should show failed to load page
+          dataLoadError = true;
         } else if (data) {
           if (data.user_name) {
             userName = data.user_name;
@@ -151,7 +149,12 @@ document
         }
       } catch (err) {
         console.error("Error:", err);
+        dataLoadError = true;
       }
+    } else if (!supabase) {
+      // If Supabase client is not initialized, show error page
+      console.error("Supabase client not initialized");
+      dataLoadError = true;
     }
 
     const assets = [
@@ -407,9 +410,9 @@ document
     // Remove loading screen from DOM after fade completes
     loadingScreen.remove();
 
-    // Check if UID was not found and show appropriate page
-    if (uidNotFound) {
-      showUidNotFoundPage();
+    // Check if there was an error loading data and show error page
+    if (dataLoadError) {
+      showErrorPage();
       return; // Stop execution, don't render main content
     }
 

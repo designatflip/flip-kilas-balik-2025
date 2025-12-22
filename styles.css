@@ -4,18 +4,30 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
 body {
   font-family: 'Gaegu', cursive;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #1D2D44;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  position: relative;
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   justify-content: center;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .app-container {
@@ -196,6 +208,7 @@ body {
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+  touch-action: pan-y;
 }
 
 /* Scroll indicator - bouncing arrow and text */
