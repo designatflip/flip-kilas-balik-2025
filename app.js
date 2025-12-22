@@ -970,81 +970,38 @@ document
         downloadBtn.alt = "Download";
         downloadBtn.className = "wallpaper-download-btn";
 
-        // Download functionality (triggered by clicking the image)
-        const handleDownload = async () => {
-          // Replace download button with progress indicator
-          downloadBtnContainer.innerHTML = "";
-          const progressDiv = document.createElement("div");
-          progressDiv.className = "download-progress";
-          const progressText = document.createElement("span");
-          progressText.className = "download-progress-text";
-          progressText.textContent = "0%";
-          progressDiv.appendChild(progressText);
-          downloadBtnContainer.appendChild(progressDiv);
-
+        // Share functionality (triggered by clicking the image)
+        const handleShare = async () => {
           try {
             // Fetch the image
             const response = await fetch(wallpaperSrc);
-            const contentLength = response.headers.get("content-length");
-            const total = parseInt(contentLength, 10);
-            let loaded = 0;
+            const blob = await response.blob();
+            const file = new File([blob], `wallpaper-${index + 1}.png`, { type: "image/png" });
 
-            const reader = response.body.getReader();
-            const chunks = [];
-
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-
-              chunks.push(value);
-              loaded += value.length;
-
-              // Update progress
-              const percentage = Math.round((loaded / total) * 100);
-              progressText.textContent = `${percentage}%`;
-              progressDiv.style.background = `conic-gradient(#5A7FA8 ${
-                percentage * 3.6
-              }deg, transparent 0deg)`;
+            if (navigator.share) {
+              await navigator.share({
+                files: [file],
+                title: "Flip Wallpaper",
+                text: "Wallpaper unik buat kamu yang sedang berjuang",
+              });
+            } else {
+              // Fallback: download the image if Web Share API is not supported
+              const url = window.URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = `wallpaper-${index + 1}.png`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              window.URL.revokeObjectURL(url);
             }
-
-            // Combine chunks into blob
-            const blob = new Blob(chunks);
-            const url = window.URL.createObjectURL(blob);
-
-            // Create download link
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `wallpaper-${index + 1}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            // Clean up
-            window.URL.revokeObjectURL(url);
-
-            // Restore download button after 1 second
-            setTimeout(() => {
-              downloadBtnContainer.innerHTML = "";
-              const newDownloadBtn = document.createElement("img");
-              newDownloadBtn.src = "assets/navigation/Download_btn.png";
-              newDownloadBtn.alt = "Download";
-              newDownloadBtn.className = "wallpaper-download-btn";
-              downloadBtnContainer.appendChild(newDownloadBtn);
-            }, 1000);
           } catch (error) {
-            console.error("Download failed:", error);
-            // Restore download button on error
-            downloadBtnContainer.innerHTML = "";
-            const newDownloadBtn = document.createElement("img");
-            newDownloadBtn.src = "assets/navigation/Download_btn.png";
-            newDownloadBtn.alt = "Download";
-            newDownloadBtn.className = "wallpaper-download-btn";
-            downloadBtnContainer.appendChild(newDownloadBtn);
+            console.error("Share failed:", error);
           }
         };
 
-        // Add click event to the wallpaper image to trigger download
-        wallpaperImg.addEventListener("click", handleDownload);
+        // Add click event to the wallpaper image to trigger share
+        wallpaperImg.addEventListener("click", handleShare);
 
         downloadBtnContainer.appendChild(downloadBtn);
         wallpaperItem.appendChild(downloadBtnContainer);
@@ -1082,6 +1039,9 @@ document
       galleryShareBtn.src = "assets/navigation/Share_btn.png";
       galleryShareBtn.alt = "Share";
       galleryShareBtn.className = "nav-btn share-btn";
+      galleryShareBtn.addEventListener("click", () => {
+        sharePopup.classList.add("active");
+      });
 
       const galleryHomeBtn = document.createElement("img");
       galleryHomeBtn.src = "assets/navigation/Gallery_btn_home.png";
@@ -1216,12 +1176,21 @@ document
         }
       };
 
-      // Generate image when popup opens
-      sharePopup.addEventListener("transitionend", () => {
-        if (sharePopup.classList.contains("active")) {
-          generateShareImage();
-        }
+      // Generate image immediately when popup opens
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === "class") {
+            if (sharePopup.classList.contains("active")) {
+              // Small delay to ensure popup is rendered
+              setTimeout(() => {
+                generateShareImage();
+              }, 100);
+            }
+          }
+        });
       });
+
+      observer.observe(sharePopup, { attributes: true });
 
       const shareOptions = document.createElement("div");
       shareOptions.className = "share-options";
