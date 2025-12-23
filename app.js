@@ -1547,7 +1547,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             .share({
               files: [file],
               title: "Flip Kilas Balik 2025",
-              text: "Hey, tau gak? Banyak cerita yang terjadi di 2025 ini. Flip kirim surat soal tentang perjalananmu tahun ini. Cek detailnya di sini ya https://homepage1.onelink.me/eopM/9ua400dc",
+              text: "Hey, tau gak? Banyak cerita yang terjadi di 2025 ini. Flip kirim surat tentang perjalananmu tahun ini. Cek detailnya di sini ya https://homepage1.onelink.me/eopM/9ua400dc",
             })
             .catch((err) => {
               console.error("Error sharing:", err);
