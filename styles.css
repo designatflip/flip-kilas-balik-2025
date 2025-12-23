@@ -450,6 +450,8 @@ html {
 }
 
 .download-btn-container {
+    width: 52px;
+      height: 52px;
   position: absolute;
   bottom: 12px;
   right: 12px;

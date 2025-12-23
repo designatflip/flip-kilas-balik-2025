@@ -68,6 +68,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     milestones: new Set(), // Track which milestones have been reached
   };
 
+  // Helper function to detect platform
+  const isIOS = () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return /iphone|ipad|ipod/.test(userAgent);
+  };
+
+  const isAndroid = () => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return /android/.test(userAgent);
+  };
+
   // Function to save analytics to database
   const saveAnalytics = async () => {
     if (!uid || !supabase || dataLoadError) return;
@@ -122,8 +133,53 @@ document.addEventListener("DOMContentLoaded", async function () {
           analytics.userName = data.user_name;
         }
 
-        // Save initial analytics (user opened the web)
-        await saveAnalytics();
+        // Fetch existing analytics if available
+        const { data: existingAnalytics } = await supabase
+          .from("user_record")
+          .select("*")
+          .eq("uid", uid)
+          .single();
+
+        if (existingAnalytics) {
+          // Load existing values into analytics object
+          analytics.scrollMilestone = existingAnalytics.scrollMilestone || 0;
+          analytics.isClickShareBtn =
+            existingAnalytics.isClickShareBtn || false;
+          analytics.isClickShareBtnPopUp =
+            existingAnalytics.isClickShareBtnPopUp || false;
+          analytics.isClickingGalleryBtn =
+            existingAnalytics.isClickingGalleryBtn || false;
+          analytics.countWallpaperDownload =
+            existingAnalytics.countWallpaperDownload || 0;
+          analytics.isClickLastBanner =
+            existingAnalytics.isClickLastBanner || false;
+          // Reconstruct milestones set based on current scrollMilestone
+          if (existingAnalytics.scrollMilestone >= 10)
+            analytics.milestones.add(10);
+          if (existingAnalytics.scrollMilestone >= 20)
+            analytics.milestones.add(20);
+          if (existingAnalytics.scrollMilestone >= 30)
+            analytics.milestones.add(30);
+          if (existingAnalytics.scrollMilestone >= 40)
+            analytics.milestones.add(40);
+          if (existingAnalytics.scrollMilestone >= 50)
+            analytics.milestones.add(50);
+          if (existingAnalytics.scrollMilestone >= 60)
+            analytics.milestones.add(60);
+          if (existingAnalytics.scrollMilestone >= 70)
+            analytics.milestones.add(70);
+          if (existingAnalytics.scrollMilestone >= 80)
+            analytics.milestones.add(80);
+          if (existingAnalytics.scrollMilestone >= 90)
+            analytics.milestones.add(90);
+          if (existingAnalytics.scrollMilestone >= 100)
+            analytics.milestones.add(100);
+        }
+
+        // Save initial analytics only if this is a new visit (no existing analytics)
+        if (!existingAnalytics) {
+          await saveAnalytics();
+        }
         if (data.amount_saved !== null && data.amount_saved !== undefined) {
           amountSavedRaw = data.amount_saved;
           amountSaved = `Rp${data.amount_saved.toLocaleString("id-ID", {
@@ -512,34 +568,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       downloadBtn.alt = "Download";
       downloadBtn.className = "wallpaper-download-btn";
 
-      // Download button click handler
-      downloadBtn.addEventListener("click", (e) => {
-        e.stopPropagation(); // Prevent triggering wallpaper image click
-
-        // Track wallpaper click (download button)
-        if (!dataLoadError) {
-          analytics.countWallpaperDownload++;
-          debouncedSave();
-        }
-
-        // Download the wallpaper
-        fetch(wallpaperSrc)
-          .then((response) => response.blob())
-          .then((blob) => {
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `flip-wallpaper-${index + 1}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-          })
-          .catch((error) => {
-            console.error("Download failed:", error);
-          });
-      });
-
       // Pre-fetch wallpaper blob for instant sharing (Android compatibility)
       let cachedBlob = null;
       fetch(wallpaperSrc)
@@ -551,26 +579,37 @@ document.addEventListener("DOMContentLoaded", async function () {
           console.error("Failed to cache wallpaper:", error);
         });
 
-      // Share functionality (triggered by clicking the image)
+      // Share functionality (triggered by clicking the image or download button)
       const handleShare = () => {
         // Use cached blob if available (instant share for Android)
         if (cachedBlob) {
-          const file = new File([cachedBlob], `wallpaper-${index + 1}.png`, {
-            type: "image/png",
-          });
+          // Android: Direct download, iOS: Share dialog
+          if (isAndroid()) {
+            // Direct download for Android
+            const url = window.URL.createObjectURL(cachedBlob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `wallpaper-${index + 1}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+          } else if (isIOS() && navigator.share) {
+            // Share dialog for iOS
+            const file = new File([cachedBlob], `wallpaper-${index + 1}.png`, {
+              type: "image/png",
+            });
 
-          if (navigator.share) {
             navigator
               .share({
                 files: [file],
                 title: "Flip Wallpaper",
-                text: "Wallpaper unik buat kamu yang sedang berjuang",
               })
               .catch((error) => {
                 console.error("Share failed:", error);
               });
           } else {
-            // Fallback: download the image if Web Share API is not supported
+            // Fallback for other platforms
             const url = window.URL.createObjectURL(cachedBlob);
             const link = document.createElement("a");
             link.href = url;
@@ -585,17 +624,28 @@ document.addEventListener("DOMContentLoaded", async function () {
           fetch(wallpaperSrc)
             .then((response) => response.blob())
             .then((blob) => {
-              const file = new File([blob], `wallpaper-${index + 1}.png`, {
-                type: "image/png",
-              });
+              if (isAndroid()) {
+                // Direct download for Android
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `wallpaper-${index + 1}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+              } else if (isIOS() && navigator.share) {
+                // Share dialog for iOS
+                const file = new File([blob], `wallpaper-${index + 1}.png`, {
+                  type: "image/png",
+                });
 
-              if (navigator.share) {
                 return navigator.share({
                   files: [file],
                   title: "Flip Wallpaper",
-                  text: "Wallpaper unik buat kamu yang sedang berjuang",
                 });
               } else {
+                // Fallback for other platforms
                 const url = window.URL.createObjectURL(blob);
                 const link = document.createElement("a");
                 link.href = url;
@@ -619,6 +669,20 @@ document.addEventListener("DOMContentLoaded", async function () {
           analytics.countWallpaperDownload++;
           debouncedSave();
         }
+        handleShare();
+      });
+
+      // Download button click handler (same as clicking wallpaper image)
+      downloadBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent triggering wallpaper image click
+
+        // Track wallpaper click (download button)
+        if (!dataLoadError) {
+          analytics.countWallpaperDownload++;
+          debouncedSave();
+        }
+
+        // Trigger share (same as clicking the image)
         handleShare();
       });
 
@@ -692,7 +756,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   if (window.uidNotFoundGalleryBtn) {
     window.uidNotFoundGalleryBtn.addEventListener("click", () => {
       galleryPage.classList.add("active");
-      window.uidNotFoundGalleryBtn.src = "assets/navigation/Gallery_btn_home.png";
+      window.uidNotFoundGalleryBtn.src =
+        "assets/navigation/Gallery_btn_home.png";
     });
   }
 
@@ -1456,18 +1521,28 @@ document.addEventListener("DOMContentLoaded", async function () {
         debouncedSave();
       }
 
-      // Convert canvas immediately to avoid async delay breaking Android share
       canvas.toBlob((blob) => {
         if (!blob) {
           console.error("Failed to create blob");
           return;
         }
 
-        const file = new File([blob], "flip-kilas-balik-2025.png", {
-          type: "image/png",
-        });
+        // Android: Direct download, iOS: Share dialog
+        if (isAndroid()) {
+          // Direct download for Android
+          const dataUrl = canvas.toDataURL("image/png");
+          const link = document.createElement("a");
+          link.href = dataUrl;
+          link.download = "flip-kilas-balik-2025.png";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else if (isIOS() && navigator.share) {
+          // Share dialog for iOS
+          const file = new File([blob], "flip-kilas-balik-2025.png", {
+            type: "image/png",
+          });
 
-        if (navigator.share) {
           navigator
             .share({
               files: [file],
@@ -1552,25 +1627,50 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Track scroll milestones for analytics
     if (!dataLoadError) {
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercentage = Math.round((scrollY / scrollHeight) * 100);
 
-      // Update milestone based on scroll percentage
+      // Update milestone based on scroll percentage (10% increments)
       if (scrollPercentage >= 100 && !analytics.milestones.has(100)) {
         analytics.scrollMilestone = 100;
         analytics.milestones.add(100);
         debouncedSave();
-      } else if (scrollPercentage >= 75 && !analytics.milestones.has(75)) {
-        analytics.scrollMilestone = 75;
-        analytics.milestones.add(75);
+      } else if (scrollPercentage >= 90 && !analytics.milestones.has(90)) {
+        analytics.scrollMilestone = 90;
+        analytics.milestones.add(90);
+        debouncedSave();
+      } else if (scrollPercentage >= 80 && !analytics.milestones.has(80)) {
+        analytics.scrollMilestone = 80;
+        analytics.milestones.add(80);
+        debouncedSave();
+      } else if (scrollPercentage >= 70 && !analytics.milestones.has(70)) {
+        analytics.scrollMilestone = 70;
+        analytics.milestones.add(70);
+        debouncedSave();
+      } else if (scrollPercentage >= 60 && !analytics.milestones.has(60)) {
+        analytics.scrollMilestone = 60;
+        analytics.milestones.add(60);
         debouncedSave();
       } else if (scrollPercentage >= 50 && !analytics.milestones.has(50)) {
         analytics.scrollMilestone = 50;
         analytics.milestones.add(50);
         debouncedSave();
-      } else if (scrollPercentage >= 25 && !analytics.milestones.has(25)) {
-        analytics.scrollMilestone = 25;
-        analytics.milestones.add(25);
+      } else if (scrollPercentage >= 40 && !analytics.milestones.has(40)) {
+        analytics.scrollMilestone = 40;
+        analytics.milestones.add(40);
+        debouncedSave();
+      } else if (scrollPercentage >= 30 && !analytics.milestones.has(30)) {
+        analytics.scrollMilestone = 30;
+        analytics.milestones.add(30);
+        debouncedSave();
+      } else if (scrollPercentage >= 20 && !analytics.milestones.has(20)) {
+        analytics.scrollMilestone = 20;
+        analytics.milestones.add(20);
+        debouncedSave();
+      } else if (scrollPercentage >= 10 && !analytics.milestones.has(10)) {
+        analytics.scrollMilestone = 10;
+        analytics.milestones.add(10);
         debouncedSave();
       }
     }
