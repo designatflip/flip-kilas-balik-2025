@@ -398,8 +398,14 @@ html {
   font-size: 28px;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 30px;
+  margin-top: 30px;
   padding: 0 20px;
+  line-height: 1;
+}
+
+.gallery-subtitle {
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .wallpaper-grid {
@@ -424,10 +430,12 @@ html {
   position: relative;
   flex: 0 0 85%;
   max-width: 340px;
+  max-height: 60vh;
   aspect-ratio: 9 / 16;
   border-radius: 16px;
   overflow: hidden;
   background-color: #2A3F5F;
+  border: 2px solid #5b7f97;
   scroll-snap-align: center;
   scroll-snap-stop: always;
   transition: transform 0.3s ease;

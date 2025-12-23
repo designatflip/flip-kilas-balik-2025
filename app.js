@@ -55,6 +55,53 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Variable to track if there was an error loading data
   let dataLoadError = false;
 
+  // Analytics tracking object
+  const analytics = {
+    uid: uid,
+    userName: "",
+    scrollMilestone: 0,
+    isClickShareBtn: false,
+    isClickShareBtnPopUp: false,
+    isClickingGalleryBtn: false,
+    countWallpaperDownload: 0,
+    isClickLastBanner: false,
+    milestones: new Set(), // Track which milestones have been reached
+  };
+
+  // Function to save analytics to database
+  const saveAnalytics = async () => {
+    if (!uid || !supabase || dataLoadError) return;
+
+    try {
+      const { error } = await supabase.from("user_record").upsert(
+        {
+          uid: analytics.uid,
+          userName: analytics.userName,
+          scrollMilestone: analytics.scrollMilestone,
+          isClickShareBtn: analytics.isClickShareBtn,
+          isClickShareBtnPopUp: analytics.isClickShareBtnPopUp,
+          isClickingGalleryBtn: analytics.isClickingGalleryBtn,
+          countWallpaperDownload: analytics.countWallpaperDownload,
+          isClickLastBanner: analytics.isClickLastBanner,
+        },
+        { onConflict: "uid" }
+      );
+
+      if (error) {
+        console.error("Error saving analytics:", error);
+      }
+    } catch (error) {
+      console.error("Analytics save failed:", error);
+    }
+  };
+
+  // Debounced save function to avoid too frequent database writes
+  let saveTimeout = null;
+  const debouncedSave = () => {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(saveAnalytics, 1000); // Save after 1 second of inactivity
+  };
+
   if (uid && supabase) {
     try {
       const { data, error } = await supabase
@@ -72,10 +119,14 @@ document.addEventListener("DOMContentLoaded", async function () {
       } else if (data) {
         if (data.user_name) {
           userName = data.user_name;
+          analytics.userName = data.user_name;
         }
+
+        // Save initial analytics (user opened the web)
+        await saveAnalytics();
         if (data.amount_saved !== null && data.amount_saved !== undefined) {
           amountSavedRaw = data.amount_saved;
-          amountSaved = `Rp ${data.amount_saved.toLocaleString("id-ID", {
+          amountSaved = `Rp${data.amount_saved.toLocaleString("id-ID", {
             maximumFractionDigits: 0,
           })}`;
         }
@@ -91,7 +142,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           data.cashback_received_amount !== undefined
         ) {
           cashbackReceivedRaw = data.cashback_received_amount;
-          cashbackReceived = `Rp ${data.cashback_received_amount.toLocaleString(
+          cashbackReceived = `Rp${data.cashback_received_amount.toLocaleString(
             "id-ID",
             { maximumFractionDigits: 0 }
           )}`;
@@ -119,7 +170,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           data.profit_share_receiver !== undefined
         ) {
           profitShareReceiverRaw = data.profit_share_receiver;
-          profitShareReceiver = `Rp ${data.profit_share_receiver.toLocaleString(
+          profitShareReceiver = `Rp${data.profit_share_receiver.toLocaleString(
             "id-ID",
             { maximumFractionDigits: 0 }
           )}`;
@@ -129,7 +180,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           data.unique_code_donation_amount !== undefined
         ) {
           uniqueCodeDonationRaw = data.unique_code_donation_amount;
-          uniqueCodeDonation = `Rp ${data.unique_code_donation_amount.toLocaleString(
+          uniqueCodeDonation = `Rp${data.unique_code_donation_amount.toLocaleString(
             "id-ID"
           )}`;
         }
@@ -206,16 +257,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     "assets/navigation/Gallery_btn_home.png",
     "assets/navigation/Download_btn.png",
     "assets/navigation/share-content_btn.png",
-    "assets/navigation/close_btn.png",
-    "assets/wallpaper/wallpaper01.png",
-    "assets/wallpaper/wallpaper02.png",
-    "assets/wallpaper/wallpaper03.png",
-    "assets/wallpaper/wallpaper04.png",
-    "assets/wallpaper/wallpaper05.png",
-    "assets/wallpaper/wallpaper06.png",
-    // Add more wallpapers here as needed
-    // "assets/wallpaper/wallpaper05.png",
-    // "assets/wallpaper/wallpaper06.png",
+    "assets/navigation/close-button.png",
+    "assets/wallpaper/flip-kilas-balik-2025-01.png",
+    "assets/wallpaper/flip-kilas-balik-2025-02.png",
+    "assets/wallpaper/flip-kilas-balik-2025-03.png",
+    "assets/wallpaper/flip-kilas-balik-2025-04.png",
+    "assets/wallpaper/flip-kilas-balik-2025-05.png",
+    "assets/wallpaper/flip-kilas-balik-2025-06.png",
   ];
 
   const allAssets = [...assets, ...additionalAssets];
@@ -356,6 +404,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.body.appendChild(uidNotFoundEnvelopeContainer);
     console.log("Front envelope with buttons created");
 
+    // Store reference for later use
+    window.uidNotFoundGalleryBtn = uidNotFoundGalleryBtn;
+
     console.log("All UID not found elements appended to body");
   };
 
@@ -412,13 +463,244 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Remove loading screen from DOM after fade completes
   loadingScreen.remove();
 
+  const root = document.getElementById("root");
+
+  // Create gallery page BEFORE checking for errors so it's always available
+  const createGalleryPage = () => {
+    const galleryPage = document.createElement("div");
+    galleryPage.className = "gallery-page";
+    galleryPage.id = "galleryPage";
+
+    const galleryContainer = document.createElement("div");
+    galleryContainer.className = "gallery-container";
+
+    const galleryTitle = document.createElement("div");
+    galleryTitle.className = "gallery-title";
+    galleryTitle.innerHTML = `
+      Pesan-pesan buat kamu 🫶🏻<br>
+      <span class="gallery-subtitle">Kamu bisa download gambarnya kalo relate sama kamu</span>
+    `;
+
+    const wallpaperGrid = document.createElement("div");
+    wallpaperGrid.className = "wallpaper-grid";
+
+    // Wallpaper assets
+    const wallpapers = [
+      "assets/wallpaper/flip-kilas-balik-2025-01.png",
+      "assets/wallpaper/flip-kilas-balik-2025-02.png",
+      "assets/wallpaper/flip-kilas-balik-2025-03.png",
+      "assets/wallpaper/flip-kilas-balik-2025-04.png",
+      "assets/wallpaper/flip-kilas-balik-2025-05.png",
+      "assets/wallpaper/flip-kilas-balik-2025-06.png",
+    ];
+
+    // Create wallpaper items
+    wallpapers.forEach((wallpaperSrc, index) => {
+      const wallpaperItem = document.createElement("div");
+      wallpaperItem.className = "wallpaper-item";
+
+      const wallpaperImg = document.createElement("img");
+      wallpaperImg.src = wallpaperSrc;
+      wallpaperImg.alt = `Wallpaper ${index + 1}`;
+      wallpaperItem.appendChild(wallpaperImg);
+
+      const downloadBtnContainer = document.createElement("div");
+      downloadBtnContainer.className = "download-btn-container";
+
+      const downloadBtn = document.createElement("img");
+      downloadBtn.src = "assets/navigation/Download_btn.png";
+      downloadBtn.alt = "Download";
+      downloadBtn.className = "wallpaper-download-btn";
+
+      // Download button click handler
+      downloadBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent triggering wallpaper image click
+
+        // Track wallpaper click (download button)
+        if (!dataLoadError) {
+          analytics.countWallpaperDownload++;
+          debouncedSave();
+        }
+
+        // Download the wallpaper
+        fetch(wallpaperSrc)
+          .then((response) => response.blob())
+          .then((blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `flip-wallpaper-${index + 1}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+          })
+          .catch((error) => {
+            console.error("Download failed:", error);
+          });
+      });
+
+      // Pre-fetch wallpaper blob for instant sharing (Android compatibility)
+      let cachedBlob = null;
+      fetch(wallpaperSrc)
+        .then((response) => response.blob())
+        .then((blob) => {
+          cachedBlob = blob;
+        })
+        .catch((error) => {
+          console.error("Failed to cache wallpaper:", error);
+        });
+
+      // Share functionality (triggered by clicking the image)
+      const handleShare = () => {
+        // Use cached blob if available (instant share for Android)
+        if (cachedBlob) {
+          const file = new File([cachedBlob], `wallpaper-${index + 1}.png`, {
+            type: "image/png",
+          });
+
+          if (navigator.share) {
+            navigator
+              .share({
+                files: [file],
+                title: "Flip Wallpaper",
+                text: "Wallpaper unik buat kamu yang sedang berjuang",
+              })
+              .catch((error) => {
+                console.error("Share failed:", error);
+              });
+          } else {
+            // Fallback: download the image if Web Share API is not supported
+            const url = window.URL.createObjectURL(cachedBlob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `wallpaper-${index + 1}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+          }
+        } else {
+          // Fallback to async fetch if blob not cached yet
+          fetch(wallpaperSrc)
+            .then((response) => response.blob())
+            .then((blob) => {
+              const file = new File([blob], `wallpaper-${index + 1}.png`, {
+                type: "image/png",
+              });
+
+              if (navigator.share) {
+                return navigator.share({
+                  files: [file],
+                  title: "Flip Wallpaper",
+                  text: "Wallpaper unik buat kamu yang sedang berjuang",
+                });
+              } else {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `wallpaper-${index + 1}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+              }
+            })
+            .catch((error) => {
+              console.error("Share failed:", error);
+            });
+        }
+      };
+
+      // Add click event to the wallpaper image to trigger share
+      wallpaperImg.addEventListener("click", () => {
+        // Track wallpaper click (image)
+        if (!dataLoadError) {
+          analytics.countWallpaperDownload++;
+          debouncedSave();
+        }
+        handleShare();
+      });
+
+      downloadBtnContainer.appendChild(downloadBtn);
+      wallpaperItem.appendChild(downloadBtnContainer);
+      wallpaperGrid.appendChild(wallpaperItem);
+    });
+
+    galleryContainer.appendChild(galleryTitle);
+    galleryContainer.appendChild(wallpaperGrid);
+    galleryPage.appendChild(galleryContainer);
+
+    // Add gallery navigation envelope
+    const galleryEnvelopeContainer = document.createElement("div");
+    galleryEnvelopeContainer.className = "sticky-envelope";
+
+    const galleryEnvelopeImg = document.createElement("img");
+    galleryEnvelopeImg.src = "assets/navigation/front-envelope.png";
+    galleryEnvelopeImg.alt = "Envelope";
+    galleryEnvelopeContainer.appendChild(galleryEnvelopeImg);
+
+    const galleryNavButtons = document.createElement("div");
+    galleryNavButtons.className = "nav-buttons";
+
+    const galleryCloseBtn = document.createElement("img");
+    galleryCloseBtn.src = "assets/navigation/close-button.png";
+    galleryCloseBtn.alt = "Close";
+    galleryCloseBtn.className = "nav-btn close-btn";
+    galleryCloseBtn.addEventListener("click", () => {
+      const win = window;
+      if (win.ReactNativeWebView) {
+        win.ReactNativeWebView.postMessage("exit-page");
+      }
+    });
+
+    const galleryShareBtn = document.createElement("img");
+    galleryShareBtn.src = "assets/navigation/Share_btn.png";
+    galleryShareBtn.alt = "Share";
+    galleryShareBtn.className = "nav-btn share-btn";
+    galleryShareBtn.addEventListener("click", () => {
+      if (window.sharePopup) {
+        window.sharePopup.classList.add("active");
+      }
+    });
+
+    const galleryHomeBtn = document.createElement("img");
+    galleryHomeBtn.src = "assets/navigation/Gallery_btn_home.png";
+    galleryHomeBtn.alt = "Home";
+    galleryHomeBtn.className = "nav-btn gallery-home-btn";
+    galleryHomeBtn.addEventListener("click", () => {
+      galleryPage.classList.remove("active");
+      if (window.galleryBtn) {
+        window.galleryBtn.src = "assets/navigation/Gallery_btn.png";
+      }
+    });
+
+    galleryNavButtons.appendChild(galleryCloseBtn);
+    galleryNavButtons.appendChild(galleryShareBtn);
+    galleryNavButtons.appendChild(galleryHomeBtn);
+
+    galleryEnvelopeContainer.appendChild(galleryNavButtons);
+    galleryPage.appendChild(galleryEnvelopeContainer);
+
+    document.body.appendChild(galleryPage);
+    return galleryPage;
+  };
+
+  const galleryPage = createGalleryPage();
+
+  // UID not found gallery button click handler (if it exists)
+  if (window.uidNotFoundGalleryBtn) {
+    window.uidNotFoundGalleryBtn.addEventListener("click", () => {
+      galleryPage.classList.add("active");
+      window.uidNotFoundGalleryBtn.src = "assets/navigation/Gallery_btn_home.png";
+    });
+  }
+
   // Check if there was an error loading data and show error page
   if (dataLoadError) {
     showErrorPage();
     return; // Stop execution, don't render main content
   }
-
-  const root = document.getElementById("root");
 
   // Create app container
   const appContainer = document.createElement("div");
@@ -488,7 +770,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 17) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
-      dataOverlay.innerHTML = `<strong style="margin-bottom: 82px; display: block; font-family: 'Sometype Mono', monospace;">${ewalletTopupCount}</strong>`;
+      dataOverlay.innerHTML = `<strong style="margin-bottom: 82px; display: block; font-family: 'Sometype Mono', monospace;">${ewalletTopupCount}x </strong>`;
       imageContainer.appendChild(dataOverlay);
     }
 
@@ -496,7 +778,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (index === 18) {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
-      dataOverlay.innerHTML = `<strong style="margin-bottom: 82px; display: block; font-family: 'Sometype Mono', monospace;">${qrisTransactionCount}</strong>`;
+      dataOverlay.innerHTML = `<strong style="margin-bottom: 82px; display: block; font-family: 'Sometype Mono', monospace;">${qrisTransactionCount}x</strong>`;
       imageContainer.appendChild(dataOverlay);
     }
 
@@ -521,7 +803,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const dataOverlay = document.createElement("div");
       dataOverlay.className = "amount-overlay";
       const totalDonation = uniqueCodeDonationRaw + donationAmount;
-      const totalDonationFormatted = `Rp ${totalDonation.toLocaleString(
+      const totalDonationFormatted = `Rp${totalDonation.toLocaleString(
         "id-ID",
         { maximumFractionDigits: 0 }
       )}`;
@@ -577,7 +859,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             52
           )}
           ${createStamp(qrisTransactionCountRaw + "x", "QRIS", 19, 32)}
-          ${createStamp(unitOwnedRaw + "gr", "Beli Emas", 46, 32)}
+          ${createStamp(unitOwnedRaw, "gr emas", 46, 32)}
           ${createStamp(
             formatCurrency(uniqueCodeDonationRaw),
             "Donasi Kode Unik",
@@ -759,7 +1041,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#3A5988";
-      textContainer.textContent = "Kamu bisa jadiin belanjaan jadi cuan";
+      textContainer.textContent = "Kamu bisa bikin belanjaan jadi cuan";
       contentWrapper.appendChild(textContainer);
     }
 
@@ -788,7 +1070,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#3A5988";
       textContainer.textContent =
-        "Jajan es krim pas lagi bad day, jalan-jalan sambil nikmatin angin sepoi-sepoi atau beli barang lucu yang bikin mood naik. ";
+        "Jajan es krim pas lagi bad day, jalan cari angin segar, atau beli barang lucu yang bikin mood naik.";
       contentWrapper.appendChild(textContainer);
     }
 
@@ -809,7 +1091,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       textContainer.textContent =
         unitOwnedRaw > 0
           ? "Kamu juga gak lupa buat nabung & investasi buat masa depan "
-          : "Meski taun ini belum punya emas, terima kasih kamu emas-ih bisa bertahan sampai saat ini ❤️";
+          : "Meski tahun ini belum beli emas di Flip, terima kasih kamu emas-ih bertahan sampai saat ini.";
       contentWrapper.appendChild(textContainer);
     }
 
@@ -820,7 +1102,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       textContainer.style.backgroundColor = "#3A5988";
       textContainer.textContent =
         profitShareReceiverRaw > 0
-          ? "Mungkin jumlahnya belum sesuai yang kamu mau, yang penting udah mulai"
+          ? "Mungkin jumlahnya belum besar, tapi yang penting udah mulai."
           : "Bagi hasil belum ada, yang penting udah bisa bagi-bagi rezeki";
       contentWrapper.appendChild(textContainer);
     }
@@ -858,27 +1140,27 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // Add text after asset 26 (index 24)
-    if (index === 24) {
-      const textContainer = document.createElement("div");
-      textContainer.className = "text-container";
-      textContainer.style.backgroundColor = "#C7D7EE";
-      textContainer.style.color = "#222222";
-
-      textContainer.textContent =
-        "Setelah diinget lagi, ternyata banyak banget kan, yang udah kamu lakuin?";
-      contentWrapper.appendChild(textContainer);
-    }
-
-    // Add text after asset 27 (index 25)
     if (index === 25) {
       const textContainer = document.createElement("div");
       textContainer.className = "text-container";
       textContainer.style.backgroundColor = "#C7D7EE";
       textContainer.style.color = "#222222";
+
       textContainer.textContent =
-        "Makasih ya udah gak menyerah, meski ada masanya pengen banget. ";
+        "Setelah diinget lagi, ternyata banyak banget kan yang udah kita lewatin?";
       contentWrapper.appendChild(textContainer);
     }
+
+    // Add text after asset 27 (index 25)
+    // if (index === 25) {
+    //   const textContainer = document.createElement("div");
+    //   textContainer.className = "text-container";
+    //   textContainer.style.backgroundColor = "#C7D7EE";
+    //   textContainer.style.color = "#222222";
+    //   textContainer.textContent =
+    //     "Makasih ya udah gak menyerah, meski ada masanya pengen banget. ";
+    //   contentWrapper.appendChild(textContainer);
+    // }
 
     // Add text after asset 28 (index 26)
     if (index === 26) {
@@ -887,7 +1169,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       textContainer.style.backgroundColor = "#C7D7EE";
       textContainer.style.color = "#222222";
       textContainer.textContent =
-        "Kalau ada yang belum tercapai, kita coba lagi di tahun 2026.";
+        "Kalau ada yang belum tercapai, kita coba lagi tahun depan.";
       contentWrapper.appendChild(textContainer);
     }
 
@@ -916,10 +1198,19 @@ document.addEventListener("DOMContentLoaded", async function () {
       bannerContainer.className = "image-container";
 
       const bannerLink = document.createElement("a");
-      bannerLink.href = "https://beramal.flip.id/sedekah/rumah-zakat/bantuan-banjir-sumatera";
+      bannerLink.href =
+        "https://beramal.flip.id/sedekah/rumah-zakat/bantuan-banjir-sumatera";
       bannerLink.target = "_blank";
       bannerLink.rel = "noopener noreferrer";
       bannerLink.style.cssText = "display: block; cursor: pointer;";
+
+      // Track last banner click
+      bannerLink.addEventListener("click", () => {
+        if (!dataLoadError) {
+          analytics.isClickLastBanner = true;
+          debouncedSave();
+        }
+      });
 
       const bannerImg = document.createElement("img");
       bannerImg.src = "assets/last-banner.png";
@@ -970,6 +1261,11 @@ document.addEventListener("DOMContentLoaded", async function () {
   closeBtn.alt = "Close";
   closeBtn.className = "nav-btn close-btn";
   closeBtn.addEventListener("click", () => {
+    // Save analytics before closing
+    if (!dataLoadError) {
+      saveAnalytics();
+    }
+
     const win = window;
     if (win.ReactNativeWebView) {
       win.ReactNativeWebView.postMessage("exit-page");
@@ -995,155 +1291,20 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   root.appendChild(appContainer);
 
-  // Create gallery page
-  const createGalleryPage = () => {
-    const galleryPage = document.createElement("div");
-    galleryPage.className = "gallery-page";
-    galleryPage.id = "galleryPage";
-
-    const galleryContainer = document.createElement("div");
-    galleryContainer.className = "gallery-container";
-
-    const galleryTitle = document.createElement("div");
-    galleryTitle.className = "gallery-title";
-    galleryTitle.textContent = "Wallpaper unik buat kamu yang sedang berjuang";
-
-    const wallpaperGrid = document.createElement("div");
-    wallpaperGrid.className = "wallpaper-grid";
-
-    // Wallpaper assets
-    const wallpapers = [
-      "assets/wallpaper/wallpaper01.png",
-      "assets/wallpaper/wallpaper02.png",
-      "assets/wallpaper/wallpaper03.png",
-      "assets/wallpaper/wallpaper04.png",
-      "assets/wallpaper/wallpaper05.png",
-      "assets/wallpaper/wallpaper06.png",
-      // Add more wallpapers here as needed
-      // "assets/wallpaper/wallpaper05.png",
-      // "assets/wallpaper/wallpaper06.png",
-    ];
-
-    // Create wallpaper items
-    wallpapers.forEach((wallpaperSrc, index) => {
-      const wallpaperItem = document.createElement("div");
-      wallpaperItem.className = "wallpaper-item";
-
-      const wallpaperImg = document.createElement("img");
-      wallpaperImg.src = wallpaperSrc;
-      wallpaperImg.alt = `Wallpaper ${index + 1}`;
-      wallpaperItem.appendChild(wallpaperImg);
-
-      const downloadBtnContainer = document.createElement("div");
-      downloadBtnContainer.className = "download-btn-container";
-
-      const downloadBtn = document.createElement("img");
-      downloadBtn.src = "assets/navigation/Download_btn.png";
-      downloadBtn.alt = "Download";
-      downloadBtn.className = "wallpaper-download-btn";
-
-      // Share functionality (triggered by clicking the image)
-      const handleShare = async () => {
-        try {
-          // Fetch the image
-          const response = await fetch(wallpaperSrc);
-          const blob = await response.blob();
-          const file = new File([blob], `wallpaper-${index + 1}.png`, {
-            type: "image/png",
-          });
-
-          if (navigator.share) {
-            await navigator.share({
-              files: [file],
-              title: "Flip Wallpaper",
-              text: "Wallpaper unik buat kamu yang sedang berjuang",
-            });
-          } else {
-            // Fallback: download the image if Web Share API is not supported
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `wallpaper-${index + 1}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-          }
-        } catch (error) {
-          console.error("Share failed:", error);
-        }
-      };
-
-      // Add click event to the wallpaper image to trigger share
-      wallpaperImg.addEventListener("click", handleShare);
-
-      downloadBtnContainer.appendChild(downloadBtn);
-      wallpaperItem.appendChild(downloadBtnContainer);
-      wallpaperGrid.appendChild(wallpaperItem);
-    });
-
-    galleryContainer.appendChild(galleryTitle);
-    galleryContainer.appendChild(wallpaperGrid);
-    galleryPage.appendChild(galleryContainer);
-
-    // Add gallery navigation envelope
-    const galleryEnvelopeContainer = document.createElement("div");
-    galleryEnvelopeContainer.className = "sticky-envelope";
-
-    const galleryEnvelopeImg = document.createElement("img");
-    galleryEnvelopeImg.src = "assets/navigation/front-envelope.png";
-    galleryEnvelopeImg.alt = "Envelope";
-    galleryEnvelopeContainer.appendChild(galleryEnvelopeImg);
-
-    const galleryNavButtons = document.createElement("div");
-    galleryNavButtons.className = "nav-buttons";
-
-    const galleryCloseBtn = document.createElement("img");
-    galleryCloseBtn.src = "assets/navigation/close-button.png";
-    galleryCloseBtn.alt = "Close";
-    galleryCloseBtn.className = "nav-btn close-btn";
-    galleryCloseBtn.addEventListener("click", () => {
-      const win = window;
-      if (win.ReactNativeWebView) {
-        win.ReactNativeWebView.postMessage("exit-page");
-      }
-    });
-
-    const galleryShareBtn = document.createElement("img");
-    galleryShareBtn.src = "assets/navigation/Share_btn.png";
-    galleryShareBtn.alt = "Share";
-    galleryShareBtn.className = "nav-btn share-btn";
-    galleryShareBtn.addEventListener("click", () => {
-      sharePopup.classList.add("active");
-    });
-
-    const galleryHomeBtn = document.createElement("img");
-    galleryHomeBtn.src = "assets/navigation/Gallery_btn_home.png";
-    galleryHomeBtn.alt = "Home";
-    galleryHomeBtn.className = "nav-btn gallery-home-btn";
-    galleryHomeBtn.addEventListener("click", () => {
-      galleryPage.classList.remove("active");
-      galleryBtn.src = "assets/navigation/Gallery_btn.png";
-    });
-
-    galleryNavButtons.appendChild(galleryCloseBtn);
-    galleryNavButtons.appendChild(galleryShareBtn);
-    galleryNavButtons.appendChild(galleryHomeBtn);
-
-    galleryEnvelopeContainer.appendChild(galleryNavButtons);
-    galleryPage.appendChild(galleryEnvelopeContainer);
-
-    document.body.appendChild(galleryPage);
-    return galleryPage;
-  };
-
-  const galleryPage = createGalleryPage();
-
-  // Gallery button click handler
+  // Gallery button click handler (gallery page was already created earlier)
   galleryBtn.addEventListener("click", () => {
     galleryPage.classList.add("active");
     galleryBtn.src = "assets/navigation/Gallery_btn_home.png";
+
+    // Track gallery button click
+    if (!dataLoadError) {
+      analytics.isClickingGalleryBtn = true;
+      debouncedSave();
+    }
   });
+
+  // Store galleryBtn reference for later use
+  window.galleryBtn = galleryBtn;
 
   // Create share popup
   const createSharePopup = () => {
@@ -1250,7 +1411,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           52
         );
         drawStamp(qrisTransactionCountRaw + "x", "QRIS", 19, 32);
-        drawStamp(unitOwnedRaw + "gr", "Beli Emas", 46, 32);
+        drawStamp(unitOwnedRaw, "gr emas", 46, 32);
         drawStamp(
           formatCurrency(uniqueCodeDonationRaw),
           "Donasi Kode Unik",
@@ -1288,32 +1449,45 @@ document.addEventListener("DOMContentLoaded", async function () {
     shareButton.src = "assets/navigation/share-content_btn.png";
     shareButton.alt = "Bagikan";
     shareButton.className = "share-main-btn";
-    shareButton.addEventListener("click", async () => {
-      const dataUrl = canvas.toDataURL("image/png");
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], "flip-kilas-balik-2025.png", {
-        type: "image/png",
-      });
-
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: "Flip Kilas Balik 2025",
-            text: "Check out my Flip year in review!",
-          });
-        } catch (err) {
-          console.error("Error sharing:", err);
-        }
-      } else {
-        // Fallback: download the image if Web Share API is not supported
-        const link = document.createElement("a");
-        link.href = dataUrl;
-        link.download = "flip-kilas-balik-2025.png";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    shareButton.addEventListener("click", () => {
+      // Track Bagikan button click in popup
+      if (!dataLoadError) {
+        analytics.isClickShareBtnPopUp = true;
+        debouncedSave();
       }
+
+      // Convert canvas immediately to avoid async delay breaking Android share
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          console.error("Failed to create blob");
+          return;
+        }
+
+        const file = new File([blob], "flip-kilas-balik-2025.png", {
+          type: "image/png",
+        });
+
+        if (navigator.share) {
+          navigator
+            .share({
+              files: [file],
+              title: "Flip Kilas Balik 2025",
+              text: "Hey, tau gak? Banyak cerita yang terjadi di 2025 ini. Flip kirim surat soal tentang perjalananmu tahun ini. Cek detailnya di sini ya https://homepage1.onelink.me/eopM/9ua400dc",
+            })
+            .catch((err) => {
+              console.error("Error sharing:", err);
+            });
+        } else {
+          // Fallback: download the image if Web Share API is not supported
+          const dataUrl = canvas.toDataURL("image/png");
+          const link = document.createElement("a");
+          link.href = dataUrl;
+          link.download = "flip-kilas-balik-2025.png";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }, "image/png");
     });
 
     // Close button using image
@@ -1348,6 +1522,12 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Share button click handler
   shareBtn.addEventListener("click", () => {
     sharePopup.classList.add("active");
+
+    // Track share button click
+    if (!dataLoadError) {
+      analytics.isClickShareBtn = true;
+      debouncedSave();
+    }
   });
 
   // Handle scroll effects for background fade and scroll indicator
@@ -1368,6 +1548,45 @@ document.addEventListener("DOMContentLoaded", async function () {
       scrollIndicator.style.display = "none";
     } else {
       scrollIndicator.style.display = "block";
+    }
+
+    // Track scroll milestones for analytics
+    if (!dataLoadError) {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercentage = Math.round((scrollY / scrollHeight) * 100);
+
+      // Update milestone based on scroll percentage
+      if (scrollPercentage >= 100 && !analytics.milestones.has(100)) {
+        analytics.scrollMilestone = 100;
+        analytics.milestones.add(100);
+        debouncedSave();
+      } else if (scrollPercentage >= 75 && !analytics.milestones.has(75)) {
+        analytics.scrollMilestone = 75;
+        analytics.milestones.add(75);
+        debouncedSave();
+      } else if (scrollPercentage >= 50 && !analytics.milestones.has(50)) {
+        analytics.scrollMilestone = 50;
+        analytics.milestones.add(50);
+        debouncedSave();
+      } else if (scrollPercentage >= 25 && !analytics.milestones.has(25)) {
+        analytics.scrollMilestone = 25;
+        analytics.milestones.add(25);
+        debouncedSave();
+      }
+    }
+  });
+
+  // Save analytics when user leaves the page
+  window.addEventListener("beforeunload", () => {
+    if (!dataLoadError) {
+      saveAnalytics();
+    }
+  });
+
+  // Save analytics when page visibility changes (user switches tabs)
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden" && !dataLoadError) {
+      saveAnalytics();
     }
   });
 });
