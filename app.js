@@ -79,6 +79,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     return /android/.test(userAgent);
   };
 
+  // Log detected platform for debugging
+  console.log("Platform Detection:", {
+    userAgent: navigator.userAgent,
+    isIOS: isIOS(),
+    isAndroid: isAndroid(),
+    platform: isIOS() ? "iOS" : isAndroid() ? "Android" : "Other",
+  });
+
   // Function to save analytics to database
   const saveAnalytics = async () => {
     if (!uid || !supabase || dataLoadError) return;
@@ -521,6 +529,49 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   const root = document.getElementById("root");
 
+  // Function to show wallpaper in fullscreen (Android only)
+  const showWallpaperFullscreen = (wallpaperSrc, wallpaperIndex) => {
+    // Create fullscreen container
+    const fullscreenView = document.createElement("div");
+    fullscreenView.className = "wallpaper-fullscreen-android";
+
+    const fullscreenContent = document.createElement("div");
+    fullscreenContent.className = "wallpaper-fullscreen-content";
+
+    // Title
+    const fullscreenTitle = document.createElement("div");
+    fullscreenTitle.className = "wallpaper-fullscreen-title";
+    fullscreenTitle.textContent = "Kamu bisa screenshot gambarnya untuk simpan & bagikan";
+
+    // Image container
+    const imageContainer = document.createElement("div");
+    imageContainer.className = "wallpaper-fullscreen-image-container";
+
+    const wallpaperImage = document.createElement("img");
+    wallpaperImage.src = wallpaperSrc;
+    wallpaperImage.alt = `Wallpaper ${wallpaperIndex + 1}`;
+    wallpaperImage.className = "wallpaper-fullscreen-image";
+
+    imageContainer.appendChild(wallpaperImage);
+
+    // Close button (placed at bottom)
+    const closeBtn = document.createElement("img");
+    closeBtn.src = "assets/navigation/close-button.png";
+    closeBtn.alt = "Close";
+    closeBtn.className = "wallpaper-fullscreen-close-btn";
+    closeBtn.addEventListener("click", () => {
+      document.body.removeChild(fullscreenView);
+    });
+
+    // Append elements in order: title, image, close button
+    fullscreenContent.appendChild(fullscreenTitle);
+    fullscreenContent.appendChild(imageContainer);
+    fullscreenContent.appendChild(closeBtn);
+
+    fullscreenView.appendChild(fullscreenContent);
+    document.body.appendChild(fullscreenView);
+  };
+
   // Create gallery page BEFORE checking for errors so it's always available
   const createGalleryPage = () => {
     const galleryPage = document.createElement("div");
@@ -532,10 +583,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const galleryTitle = document.createElement("div");
     galleryTitle.className = "gallery-title";
-    galleryTitle.innerHTML = `
-      Pesan-pesan buat kamu 🫶🏻<br>
-      <span class="gallery-subtitle">Kamu bisa download gambarnya kalo relate sama kamu</span>
-    `;
+    // Hide subtitle for Android
+    galleryTitle.innerHTML = isAndroid()
+      ? `Pesan-pesan buat kamu 🫶🏻`
+      : `Pesan-pesan buat kamu 🫶🏻<br>
+      <span class="gallery-subtitle">Kamu bisa download gambarnya kalo relate sama kamu</span>`;
 
     const wallpaperGrid = document.createElement("div");
     wallpaperGrid.className = "wallpaper-grid";
@@ -564,8 +616,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       downloadBtnContainer.className = "download-btn-container";
 
       const downloadBtn = document.createElement("img");
-      downloadBtn.src = "assets/navigation/Download_btn.png";
-      downloadBtn.alt = "Download";
+      // Use fullScreen_btn for Android, Download_btn for iOS
+      downloadBtn.src = isAndroid()
+        ? "assets/navigation/fullScreen_btn.png"
+        : "assets/navigation/Download_btn.png";
+      downloadBtn.alt = isAndroid() ? "Fullscreen" : "Download";
       downloadBtn.className = "wallpaper-download-btn";
 
       // Pre-fetch wallpaper blob for instant sharing (Android compatibility)
@@ -581,20 +636,12 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       // Share functionality (triggered by clicking the image or download button)
       const handleShare = () => {
-        // Use cached blob if available (instant share for Android)
-        if (cachedBlob) {
-          // Android: Direct download, iOS: Share dialog
-          if (isAndroid()) {
-            // Direct download for Android
-            const url = window.URL.createObjectURL(cachedBlob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `wallpaper-${index + 1}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-          } else if (isIOS() && navigator.share) {
+        // Android: Show fullscreen wallpaper view
+        if (isAndroid()) {
+          showWallpaperFullscreen(wallpaperSrc, index);
+        } else if (cachedBlob) {
+          // iOS/Desktop: Share dialog or download
+          if (isIOS() && navigator.share) {
             // Share dialog for iOS
             const file = new File([cachedBlob], `wallpaper-${index + 1}.png`, {
               type: "image/png",
@@ -620,21 +667,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             window.URL.revokeObjectURL(url);
           }
         } else {
-          // Fallback to async fetch if blob not cached yet
+          // Fallback to async fetch if blob not cached yet (iOS/Desktop only)
           fetch(wallpaperSrc)
             .then((response) => response.blob())
             .then((blob) => {
-              if (isAndroid()) {
-                // Direct download for Android
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = `wallpaper-${index + 1}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(url);
-              } else if (isIOS() && navigator.share) {
+              if (isIOS() && navigator.share) {
                 // Share dialog for iOS
                 const file = new File([blob], `wallpaper-${index + 1}.png`, {
                   type: "image/png",
@@ -1371,21 +1408,24 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Store galleryBtn reference for later use
   window.galleryBtn = galleryBtn;
 
-  // Create share popup
+  // Create share popup (iOS/Desktop) or fullscreen view (Android only)
   const createSharePopup = () => {
     const sharePopup = document.createElement("div");
-    sharePopup.className = "share-popup";
+    // Only use fullscreen for Android devices, popup for everything else
+    sharePopup.className = isAndroid() ? "share-fullscreen-android" : "share-popup";
     sharePopup.id = "sharePopup";
 
     const sharePopupContent = document.createElement("div");
-    sharePopupContent.className = "share-popup-content";
+    sharePopupContent.className = isAndroid() ? "share-fullscreen-content" : "share-popup-content";
 
     const shareTitle = document.createElement("div");
-    shareTitle.className = "share-popup-title";
-    shareTitle.textContent = "Bagikan ke teman-temanmu?";
+    shareTitle.className = isAndroid() ? "share-fullscreen-title" : "share-popup-title";
+    shareTitle.textContent = isAndroid()
+      ? "Screenshot halaman ini untuk bagikan cerita"
+      : "Bagikan ke teman-temanmu?";
 
     const sharePreviewContainer = document.createElement("div");
-    sharePreviewContainer.className = "share-preview-container";
+    sharePreviewContainer.className = isAndroid() ? "share-fullscreen-preview" : "share-preview-container";
 
     // Create canvas to capture asset 26 with overlay
     const canvas = document.createElement("canvas");
@@ -1509,75 +1549,78 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     observer.observe(sharePopup, { attributes: true });
 
-    // Single share button using image
-    const shareButton = document.createElement("img");
-    shareButton.src = "assets/navigation/share-content_btn.png";
-    shareButton.alt = "Bagikan";
-    shareButton.className = "share-main-btn";
-    shareButton.addEventListener("click", () => {
-      // Track Bagikan button click in popup
-      if (!dataLoadError) {
-        analytics.isClickShareBtnPopUp = true;
-        debouncedSave();
-      }
-
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          console.error("Failed to create blob");
-          return;
-        }
-
-        // Android: Direct download, iOS: Share dialog
-        if (isAndroid()) {
-          // Direct download for Android
-          const dataUrl = canvas.toDataURL("image/png");
-          const link = document.createElement("a");
-          link.href = dataUrl;
-          link.download = "flip-kilas-balik-2025.png";
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        } else if (isIOS() && navigator.share) {
-          // Share dialog for iOS
-          const file = new File([blob], "flip-kilas-balik-2025.png", {
-            type: "image/png",
-          });
-
-          navigator
-            .share({
-              files: [file],
-              title: "Flip Kilas Balik 2025",
-              text: "Hey, tau gak? Banyak cerita yang terjadi di 2025 ini. Flip kirim surat tentang perjalananmu tahun ini. Cek detailnya di sini ya https://homepage1.onelink.me/eopM/9ua400dc",
-            })
-            .catch((err) => {
-              console.error("Error sharing:", err);
-            });
-        } else {
-          // Fallback: download the image if Web Share API is not supported
-          const dataUrl = canvas.toDataURL("image/png");
-          const link = document.createElement("a");
-          link.href = dataUrl;
-          link.download = "flip-kilas-balik-2025.png";
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-      }, "image/png");
-    });
-
     // Close button using image
     const closeBtn = document.createElement("img");
     closeBtn.src = "assets/navigation/close-button.png";
     closeBtn.alt = "Close";
-    closeBtn.className = "share-close-btn";
+    closeBtn.className = isAndroid() ? "share-fullscreen-close-btn-bottom" : "share-close-btn";
     closeBtn.addEventListener("click", () => {
       sharePopup.classList.remove("active");
     });
 
-    sharePopupContent.appendChild(closeBtn);
-    sharePopupContent.appendChild(shareTitle);
-    sharePopupContent.appendChild(sharePreviewContainer);
-    sharePopupContent.appendChild(shareButton);
+    // Append elements in correct order
+    // For Android: title, preview, close button (at bottom)
+    // For iOS/Desktop: close button (top right), title, preview, share button
+    if (isAndroid()) {
+      sharePopupContent.appendChild(shareTitle);
+      sharePopupContent.appendChild(sharePreviewContainer);
+      sharePopupContent.appendChild(closeBtn);
+    } else {
+      sharePopupContent.appendChild(closeBtn);
+      sharePopupContent.appendChild(shareTitle);
+      sharePopupContent.appendChild(sharePreviewContainer);
+    }
+
+    // For iOS/Desktop: Share button with share dialog functionality (placed AFTER preview)
+    // For Android: No share button needed (screenshot only)
+    if (!isAndroid()) {
+      const shareButton = document.createElement("img");
+      shareButton.src = "assets/navigation/share-content_btn.png";
+      shareButton.alt = "Bagikan";
+      shareButton.className = "share-main-btn";
+      shareButton.addEventListener("click", () => {
+        // Track Bagikan button click in popup
+        if (!dataLoadError) {
+          analytics.isClickShareBtnPopUp = true;
+          debouncedSave();
+        }
+
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            console.error("Failed to create blob");
+            return;
+          }
+
+          // iOS: Share dialog
+          if (isIOS() && navigator.share) {
+            const file = new File([blob], "flip-kilas-balik-2025.png", {
+              type: "image/png",
+            });
+
+            navigator
+              .share({
+                files: [file],
+                title: "Flip Kilas Balik 2025",
+                text: "Hey, tau gak? Banyak cerita yang terjadi di 2025 ini. Flip kirim surat tentang perjalananmu tahun ini. Cek detailnya di sini ya https://homepage1.onelink.me/eopM/9ua400dc",
+              })
+              .catch((err) => {
+                console.error("Error sharing:", err);
+              });
+          } else {
+            // Fallback: download the image if Web Share API is not supported
+            const dataUrl = canvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = dataUrl;
+            link.download = "flip-kilas-balik-2025.png";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        }, "image/png");
+      });
+
+      sharePopupContent.appendChild(shareButton);
+    }
 
     sharePopup.appendChild(sharePopupContent);
 

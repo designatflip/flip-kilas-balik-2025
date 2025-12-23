@@ -592,6 +592,177 @@ html {
   transform: scale(0.9);
 }
 
+/* Android fullscreen share view */
+.share-fullscreen-android {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #3b5579;
+  z-index: 10004;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.share-fullscreen-android.active {
+  display: flex;
+}
+
+.share-fullscreen-content {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px 20px 40px 20px;
+  position: relative;
+  background-color: #3b5579;
+}
+
+.share-fullscreen-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 0 20px;
+  line-height: 1.4;
+}
+
+.share-fullscreen-preview {
+  width: 100%;
+  max-width: 480px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.share-fullscreen-preview canvas {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.share-fullscreen-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: block;
+  z-index: 10;
+}
+
+.share-fullscreen-close-btn:hover {
+  opacity: 0.8;
+}
+
+.share-fullscreen-close-btn:active {
+  transform: scale(0.9);
+}
+
+/* Close button at bottom for Android share fullscreen */
+.share-fullscreen-close-btn-bottom {
+  width: 52px;
+  height: 52px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: block;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.share-fullscreen-close-btn-bottom:hover {
+  opacity: 0.8;
+}
+
+.share-fullscreen-close-btn-bottom:active {
+  transform: scale(0.9);
+}
+
+/* Wallpaper fullscreen view (Android only) */
+.wallpaper-fullscreen-android {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #1D2D44;
+  z-index: 10005;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wallpaper-fullscreen-content {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 40px 20px 20px 20px;
+  position: relative;
+  background-color: #3b5579;
+}
+
+.wallpaper-fullscreen-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 0 20px;
+  line-height: 1.4;
+}
+
+.wallpaper-fullscreen-image-container {
+  width: 100%;
+  max-width: 480px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.wallpaper-fullscreen-image {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  display: block;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.wallpaper-fullscreen-close-btn {
+  width: 52px;
+  height: 52px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.wallpaper-fullscreen-close-btn:hover {
+  opacity: 0.8;
+}
+
+.wallpaper-fullscreen-close-btn:active {
+  transform: scale(0.9);
+}
+
 /* Mobile optimization */
 @media (max-width: 375px) {
   .app-container {
