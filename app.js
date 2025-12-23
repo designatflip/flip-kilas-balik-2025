@@ -55,20 +55,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Variable to track if there was an error loading data
   let dataLoadError = false;
 
-  // Analytics tracking object
-  const analytics = {
-    uid: uid,
-    userName: "",
-    scrollMilestone: 0,
-    isClickShareBtn: false,
-    isClickShareBtnPopUp: false,
-    isClickingGalleryBtn: false,
-    countWallpaperDownload: 0,
-    isClickLastBanner: false,
-    milestones: new Set(), // Track which milestones have been reached
-  };
-
-  // Helper function to detect platform
+  // Helper function to detect platform (MUST be defined first)
   const isIOS = () => {
     const userAgent = navigator.userAgent.toLowerCase();
     return /iphone|ipad|ipod/.test(userAgent);
@@ -77,6 +64,27 @@ document.addEventListener("DOMContentLoaded", async function () {
   const isAndroid = () => {
     const userAgent = navigator.userAgent.toLowerCase();
     return /android/.test(userAgent);
+  };
+
+  // Detect device type (called AFTER isIOS and isAndroid are defined)
+  const getDeviceType = () => {
+    if (isIOS()) return "iOS";
+    if (isAndroid()) return "Android";
+    return "Other";
+  };
+
+  // Analytics tracking object
+  const analytics = {
+    uid: uid,
+    userName: "",
+    device: getDeviceType(), // Track device type
+    scrollMilestone: 0,
+    isClickShareBtn: false,
+    isClickShareBtnPopUp: false,
+    isClickingGalleryBtn: false,
+    countWallpaperDownload: 0,
+    isClickLastBanner: false,
+    milestones: new Set(), // Track which milestones have been reached
   };
 
   // Log detected platform for debugging
@@ -96,6 +104,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         {
           uid: analytics.uid,
           userName: analytics.userName,
+          device: analytics.device, // Include device type
           scrollMilestone: analytics.scrollMilestone,
           isClickShareBtn: analytics.isClickShareBtn,
           isClickShareBtnPopUp: analytics.isClickShareBtnPopUp,
@@ -161,6 +170,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             existingAnalytics.countWallpaperDownload || 0;
           analytics.isClickLastBanner =
             existingAnalytics.isClickLastBanner || false;
+          // Device is always updated to current device
+          analytics.device = getDeviceType();
           // Reconstruct milestones set based on current scrollMilestone
           if (existingAnalytics.scrollMilestone >= 10)
             analytics.milestones.add(10);
