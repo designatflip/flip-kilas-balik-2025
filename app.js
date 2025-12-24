@@ -552,7 +552,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Title
     const fullscreenTitle = document.createElement("div");
     fullscreenTitle.className = "wallpaper-fullscreen-title";
-    fullscreenTitle.textContent = "Kamu bisa screenshot gambarnya untuk simpan & bagikan";
+    fullscreenTitle.textContent =
+      "Kamu bisa screenshot gambarnya untuk simpan & bagikan";
 
     // Image container
     const imageContainer = document.createElement("div");
@@ -971,12 +972,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             68,
             52
           )}
-          ${createStamp(qrisTransactionCountRaw + "x", "QRIS", 19, 32)}
-          ${createStamp(unitOwnedRaw, "gr emas", 46, 32)}
+          ${createStamp(qrisTransactionCountRaw + "x", "QRIS", 77, 32)}
+
           ${createStamp(
             formatCurrency(uniqueCodeDonationRaw),
             "Donasi Kode Unik",
-            77,
+            32,
             32
           )}
           ${createStamp(
@@ -1423,20 +1424,28 @@ document.addEventListener("DOMContentLoaded", async function () {
   const createSharePopup = () => {
     const sharePopup = document.createElement("div");
     // Only use fullscreen for Android devices, popup for everything else
-    sharePopup.className = isAndroid() ? "share-fullscreen-android" : "share-popup";
+    sharePopup.className = isAndroid()
+      ? "share-fullscreen-android"
+      : "share-popup";
     sharePopup.id = "sharePopup";
 
     const sharePopupContent = document.createElement("div");
-    sharePopupContent.className = isAndroid() ? "share-fullscreen-content" : "share-popup-content";
+    sharePopupContent.className = isAndroid()
+      ? "share-fullscreen-content"
+      : "share-popup-content";
 
     const shareTitle = document.createElement("div");
-    shareTitle.className = isAndroid() ? "share-fullscreen-title" : "share-popup-title";
+    shareTitle.className = isAndroid()
+      ? "share-fullscreen-title"
+      : "share-popup-title";
     shareTitle.textContent = isAndroid()
       ? "Screenshot halaman ini untuk bagikan cerita"
       : "Bagikan ke teman-temanmu?";
 
     const sharePreviewContainer = document.createElement("div");
-    sharePreviewContainer.className = isAndroid() ? "share-fullscreen-preview" : "share-preview-container";
+    sharePreviewContainer.className = isAndroid()
+      ? "share-fullscreen-preview"
+      : "share-preview-container";
 
     // Create canvas to capture asset 26 with overlay
     const canvas = document.createElement("canvas");
@@ -1526,12 +1535,12 @@ document.addEventListener("DOMContentLoaded", async function () {
           68,
           52
         );
-        drawStamp(qrisTransactionCountRaw + "x", "QRIS", 19, 32);
-        drawStamp(unitOwnedRaw, "gr emas", 46, 32);
+        drawStamp(qrisTransactionCountRaw + "x", "QRIS", 77, 32);
+
         drawStamp(
           formatCurrency(uniqueCodeDonationRaw),
           "Donasi Kode Unik",
-          77,
+          32,
           32
         );
         drawStamp(
@@ -1564,7 +1573,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     const closeBtn = document.createElement("img");
     closeBtn.src = "assets/navigation/close-button.png";
     closeBtn.alt = "Close";
-    closeBtn.className = isAndroid() ? "share-fullscreen-close-btn-bottom" : "share-close-btn";
+    closeBtn.className = isAndroid()
+      ? "share-fullscreen-close-btn-bottom"
+      : "share-close-btn";
     closeBtn.addEventListener("click", () => {
       sharePopup.classList.remove("active");
     });
